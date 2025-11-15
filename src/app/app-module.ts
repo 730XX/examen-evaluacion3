@@ -4,10 +4,11 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { providePrimeNG } from 'primeng/config';
 import { ButtonModule } from 'primeng/button';
 import Aura from '@primeuix/themes/aura';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 import { CoreModule } from './core/core-module';
+import { authInterceptorFn } from './core/interceptors/auth-interceptor-fn';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,7 @@ import { CoreModule } from './core/core-module';
   ],
   
   providers: [
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([authInterceptorFn])),
     provideBrowserGlobalErrorListeners(),
      provideAnimationsAsync(),
         providePrimeNG({

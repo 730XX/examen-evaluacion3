@@ -1,4 +1,4 @@
 export const environment = {
-  production: false,
-  apiUrl: 'http://localhost/restaurante-api/'
+    production: false,
+    apiUrl: '//pidemesa.orealy.xyz:81'
 };
