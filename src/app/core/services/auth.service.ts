@@ -17,7 +17,6 @@ export class AuthService {
     return this.http.post<LoginResponse>(this.apiUrl, credentials).pipe(
       tap((response) => {
         if (response.tipo === '1' && response.data && response.data.token) {
-          // Guardar en localStorage
           localStorage.setItem('token', response.data.token);
           localStorage.setItem('user_name', response.data.user_name);
           localStorage.setItem('user_rol', response.data.user_rol);

@@ -118,21 +118,12 @@
   </div>
 </div>
 
-<!-- 
-  MODAL DE SALÓN
-  Conectado a las variables del TS
--->
 <app-lounge-modal
   [(visible)]="modalVisible"
   [mode]="modalMode"
   [initialData]="dataToEdit"
   (save)="onModalSave($event)"
 ></app-lounge-modal>
-
-<!-- 
-  (Aquí podrías tener un futuro app-table-modal
-   para crear/editar mesas)
--->
 
 <!-- Toast notifications -->
 <p-toast [showTransitionOptions]="'250ms'" [showTransformOptions]="'translateX(100%)'" [hideTransitionOptions]="'150ms'" [hideTransformOptions]="'translateX(100%)'" />

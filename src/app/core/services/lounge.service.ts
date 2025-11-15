@@ -31,13 +31,13 @@ export class LoungeService {
   
   // Crear nuevo salón (POST)
   createLounge(data: any): Observable<any> {
-    // El interceptor agregará el token automáticamente
+    
     return this.http.post(`${this.url}/lounge`, data);
   }
 
   // Actualizar salón (PUT)
   updateLounge(data: any): Observable<any> {
-    // El interceptor agregará el token automáticamente
+    
     return this.http.put(`${this.url}/lounge`, data);
   }
 }

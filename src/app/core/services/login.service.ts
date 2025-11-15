@@ -2,9 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
-import { environment } from '../../../environments/environment'; // Asegúrate que la ruta sea correcta
-
-// Definimos una interfaz para la respuesta esperada (opcional pero recomendado)
+import { environment } from '../../../environments/environment'; 
 interface LoginResponse {
   tipo: string;
   data: {
@@ -27,7 +25,6 @@ interface LoginResponse {
   providedIn: 'root'
 })
 export class LoginService {
-  // Construimos la URL completa desde el environment
   private apiUrl = `${environment.apiUrl}/public/rest/common/login`;
 
   constructor(private http: HttpClient) { }
@@ -45,8 +42,6 @@ export class LoginService {
 
     return this.http.post<LoginResponse>(this.apiUrl, credentials).pipe(
       tap(response => {
-        // Si el login es exitoso, guardamos los datos en localStorage
-        // Cambiado: ahora aceptamos tipo "1" como éxito
         if (response && response.tipo === '1' && response.data) {
           this.saveAuthData(response.data);
         } else {
@@ -79,7 +74,6 @@ export class LoginService {
       localStorage.setItem('store_id', data.store_id.toString());
     }
     
-    // Guardamos campos adicionales útiles
     if (data.user_id) {
       localStorage.setItem('user_id', data.user_id.toString());
     }
@@ -96,7 +90,6 @@ export class LoginService {
     localStorage.removeItem('user_name');
     localStorage.removeItem('user_rol');
     localStorage.removeItem('store_id');
-    // Aquí podrías también navegar al login si lo llamas desde un componente
   }
 
   /**
@@ -117,9 +110,8 @@ export class LoginService {
    * Maneja los errores de la petición HTTP.
    */
   private handleError(error: HttpErrorResponse) {
-    // El backend puede devolver detalles del error en error.error
+   
     console.error('API Error:', error);
-    // Devolvemos el error para que el componente pueda manejarlo (ej. mostrar un mensaje)
     return throwError(() => error);
   }
 }

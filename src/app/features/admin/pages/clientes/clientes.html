@@ -1,18 +1,12 @@
-<!-- 
-  Contenedor principal
--->
+
 <div class="w-full h-full flex flex-col bg-[#111317] text-white">
   
-  <!-- 
-    Barra de Título
-  -->
+
   <div class="flex items-center p-4 border-b border-gray-700 flex-none">
     <span class="text-2xl font-bold font-montserrat">Clientes</span>
   </div>
 
-  <!-- 
-    Barra de Acciones (Buscador y Botón)
-  -->
+
   <div class="flex items-center justify-between gap-4 p-4 border-b border-gray-700 flex-none">
     <!-- Buscador -->
     <input 
@@ -20,10 +14,7 @@
       placeholder="Buscar clientes por nombre, email o documento..."
       class="w-full md:w-1/3 px-4 py-2 bg-[#1f242f] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#3c82f5] transition-colors"
     >
-    <!-- 
-      Botón Crear
-      - (click) conectado a 'showCreateClienteDialog()'
-    -->
+
     <button 
       (click)="showCreateClienteDialog()"
       class="flex-none px-4 py-2 bg-[#3c82f5] text-white text-sm font-medium rounded-lg hover:bg-[#5a9aff] transition-colors"
@@ -32,10 +23,7 @@
     </button>
   </div>
 
-  <!-- 
-    Área de Contenido (Tabla de Clientes)
-    - Añadido 'flex-1 p-4 overflow-y-auto' para que la tabla ocupe el espacio y tenga scroll
-  -->
+
   <div class="flex-1 p-4 overflow-y-auto">
     
     <!-- Indicador de carga -->
@@ -53,9 +41,7 @@
       <table class="w-full">
         <thead class="bg-[#151a23]">
           <tr>
-            <!-- 
-              Headers de la tabla actualizados para Clientes 
-            -->
+
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
               Cliente
             </th>
@@ -75,14 +61,9 @@
         </thead>
         <tbody class="divide-y divide-gray-700">
           
-          <!-- 
-            Fila de Cliente
-            - *ngFor iterando sobre 'clientes'
-            - Celdas ('td') actualizadas a las propiedades del cliente
-          -->
           <tr *ngFor="let cliente of clientes" class="hover:bg-[#252b38] transition-colors">
             
-            <!-- Columna: Cliente (Nombre y Email) -->
+            <!-- nombre email -->
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
               <div class="flex flex-col">
                 <span class="font-semibold">{{ cliente.customer_name }}</span>
@@ -90,7 +71,7 @@
               </div>
             </td>
 
-            <!-- Columna: Documento -->
+            <!--(Documento) -->
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
               <div class="flex flex-col">
                 <span>{{ getDocumentType(cliente.customer_typedocument) }}</span>
@@ -98,7 +79,7 @@
               </div>
             </td>
 
-            <!-- Columna: Contacto (Teléfono) -->
+            <!--(Teléfono) -->
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
               {{ cliente.customer_phone }}
             </td>
@@ -134,8 +115,6 @@
   </div>
 </div>
 
-<!-- 
-  AQUÍ IRÍA TU FUTURO MODAL DE CLIENTES -->
   <app-customer-modal
     [(visible)]="modalVisible"
     [mode]="modalMode"

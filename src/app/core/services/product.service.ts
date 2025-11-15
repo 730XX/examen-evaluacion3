@@ -20,7 +20,7 @@ export class ProductService {
     subcategory_id?: string,
     subcategory_name?: string
   ): Observable<any> {
-    // El interceptor agregará el token automáticamente
+    
     let params = new HttpParams();
     
     if (product_name) params = params.set('product_name', product_name);
@@ -35,13 +35,11 @@ export class ProductService {
 
   // Crear producto (POST)
   createProduct(data: any): Observable<any> {
-    // El interceptor agregará el token automáticamente
     return this.http.post(`${this.apiUrl}/product`, data);
   }
 
   // Actualizar producto (PUT)
   updateProduct(data: any): Observable<any> {
-    // El interceptor agregará el token automáticamente
     return this.http.put(`${this.apiUrl}/product`, data);
   }
 }
