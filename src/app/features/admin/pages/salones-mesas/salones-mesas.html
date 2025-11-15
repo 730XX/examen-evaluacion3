@@ -119,14 +119,14 @@
 </div>
 
 <!-- 
-  AQUÍ ESTÁ EL MODAL DE SALÓN
+  MODAL DE SALÓN
   Conectado a las variables del TS
--->s
+-->
 <app-lounge-modal
   [(visible)]="modalVisible"
   [mode]="modalMode"
   [initialData]="dataToEdit"
-  (save)="onLoungeModalSave($event)"
+  (save)="onModalSave($event)"
 ></app-lounge-modal>
 
 <!-- 

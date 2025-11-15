@@ -6,12 +6,14 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 export interface LoungeFormData {
   name: string;
   tableCount: number;
+  state: string;
 }
 
 /** Datos que el modal recibe en modo 'edit' */
 export interface LoungeInitialData {
   name: string;
-  tableCount: number; // Asumo que recibirás el conteo
+  tableCount: number;
+  state: string;
 }
 
 
@@ -39,7 +41,8 @@ export class LoungeModal implements OnChanges {
   constructor(private fb: FormBuilder) {
     this.loungeForm = this.fb.group({
       name: ['', Validators.required],
-      tableCount: [0, [Validators.required, Validators.min(0)]]
+      tableCount: [0, [Validators.required, Validators.min(0)]],
+      state: ['1', Validators.required]
     });
   }
 
@@ -62,7 +65,8 @@ export class LoungeModal implements OnChanges {
       this.headerTitle = 'Crear Salón';
       this.loungeForm.reset({
         name: '',
-        tableCount: 0
+        tableCount: 0,
+        state: '1'
       });
     }
   }

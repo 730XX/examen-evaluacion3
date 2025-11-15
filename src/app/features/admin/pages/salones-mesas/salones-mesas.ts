@@ -31,10 +31,11 @@ export class SalonesMesas implements OnInit {
   loadingSalones = false;
   loadingMesas = false;
 
-  // Modales
-  showModal = false;
-  showModalEditar = false;
-  salonParaEditar: Lounge | null = null;
+  // Propiedades para el modal de lounge
+  modalVisible: boolean = false;
+  modalMode: 'create' | 'edit' = 'create';
+  dataToEdit: LoungeInitialData | null = null;
+  private currentEditingLoungeId: number | null = null;
 
   constructor(private loungeService: LoungeService, private tableService: TableService) {}
 
@@ -103,87 +104,120 @@ export class SalonesMesas implements OnInit {
     console.log('Detalles mesa:', mesa);
   }
 
-  // Crear un nuevo salón
-  crearSalon(data: { nombre: string; cantidadMesas: number }): void {
+  // --- Métodos para controlar el Modal de Lounge ---
+
+  public showCreateLoungeDialog(): void {
+    this.modalMode = 'create';
+    this.dataToEdit = null;
+    this.currentEditingLoungeId = null;
+    this.modalVisible = true;
+    console.log('Abriendo modal para crear salón...');
+  }
+
+  public showEditLoungeDialog(event: Event, salon: Lounge): void {
+    event.stopPropagation(); // Evitar que se seleccione el salón
+    this.modalMode = 'edit';
+    this.currentEditingLoungeId = salon.lounge_id;
+    // Mapear los datos del salón al formato que el modal espera
+    this.dataToEdit = {
+      name: salon.lounge_name,
+      tableCount: salon.cantidad_mesas,
+      state: salon.lounge_state
+    };
+    this.modalVisible = true;
+    console.log('Abriendo modal para editar salón:', salon.lounge_id);
+  }
+
+  public onModalSave(formData: LoungeFormData): void {
+    if (this.modalMode === 'create') {
+      this.crearSalon(formData);
+    } else {
+      this.editarSalon(formData);
+    }
+  }
+
+  // --- Métodos CRUD ---
+
+  private crearSalon(formData: LoungeFormData): void {
+    console.log('Creando salón:', formData);
     const storeId = parseInt(localStorage.getItem('store_id') || '1', 10);
 
     const nuevoSalon = {
-      lounge_name: data.nombre,
-      cantidad_mesas: data.cantidadMesas,
-      lounge_state: '1', // 1 = activo
-      store_id: storeId,
+      lounge_id: null, // null para crear nuevo
+      lounge_name: formData.name,
+      cantidad_mesas: formData.tableCount,
+      lounge_state: '1', // Siempre activo al crear
+      store_id: storeId
     };
 
     this.loungeService.createLounge(nuevoSalon).subscribe({
       next: (response) => {
-        console.log('Salón creado:', response);
-        if (response.tipo === '1') {
-          this.showModal = false;
+        console.log('Salón creado exitosamente:', response);
+        if (response.tipo === '1' || response.tipo === 'SUCCESS') {
           this.cargarSalones();
+          this.modalVisible = false;
+        } else {
+          console.error('Error en la respuesta:', response.mensajes);
+          alert(response.mensajes[0] || 'Error al crear salón');
         }
       },
-      error: (err) => console.error('Error al crear salón:', err),
+      error: (err) => {
+        console.error('Error al crear salón:', err);
+        if (err.status === 400) {
+          alert('Datos inválidos. Verifica los campos.');
+        } else if (err.status === 409) {
+          alert('Ya existe un salón con ese nombre.');
+        } else {
+          alert('Error al crear el salón. Intenta nuevamente.');
+        }
+      }
     });
   }
 
-  // Abrir modal para edición
-  abrirModalEditar(salon: Lounge): void {
-    this.salonParaEditar = { ...salon };
-    this.showModalEditar = true;
-  }
+  private editarSalon(formData: LoungeFormData): void {
+    console.log('Editando salón ID:', this.currentEditingLoungeId);
+    
+    if (!this.currentEditingLoungeId) return;
 
-  // Guardar cambios del salón editado
-  actualizarSalon(data: { nombre: string; cantidadMesas: number }): void {
-    if (!this.salonParaEditar) return;
+    // Buscar el salón actual para mantener sus datos
+    const salonActual = this.salones.find(s => s.lounge_id === this.currentEditingLoungeId);
+    if (!salonActual) return;
 
     const salonActualizado = {
-      lounge_id: this.salonParaEditar.lounge_id,
-      lounge_name: data.nombre,
-      cantidad_mesas: this.salonParaEditar.cantidad_mesas,
-      lounge_state: this.salonParaEditar.lounge_state,
-      store_id: this.salonParaEditar.store_id,
+      lounge_id: this.currentEditingLoungeId,
+      lounge_name: formData.name,
+      cantidad_mesas: formData.tableCount,
+      lounge_state: formData.state, // Usa el estado del formulario
+      store_id: salonActual.store_id
     };
 
     this.loungeService.updateLounge(salonActualizado).subscribe({
       next: (response) => {
-        console.log('Salón actualizado:', response);
-        if (response.tipo === '1') {
-          this.showModalEditar = false;
-          this.salonParaEditar = null;
+        console.log('Salón actualizado exitosamente:', response);
+        if (response.tipo === '1' || response.tipo === 'SUCCESS') {
           this.cargarSalones();
+          this.modalVisible = false;
+          // Si hay un salón seleccionado y es el que editamos, actualizar
+          if (this.salonSeleccionado?.lounge_id === this.currentEditingLoungeId) {
+            this.salonSeleccionado = null;
+          }
+        } else {
+          console.error('Error en la respuesta:', response.mensajes);
+          alert(response.mensajes[0] || 'Error al actualizar salón');
         }
       },
-      error: (err) => console.error('Error al actualizar salón:', err),
-    });
-  }
-
-  // Activar o desactivar salón
-  cambiarEstadoSalon(salon: Lounge): void {
-    // Determinar si está activo actualmente
-    const esActivo = this.esActivo(salon.lounge_state);
-    const nuevoEstado = esActivo ? '0' : '1';
-
-    const salonActualizado = {
-      lounge_id: salon.lounge_id,
-      lounge_name: salon.lounge_name,
-      cantidad_mesas: salon.cantidad_mesas,
-      lounge_state: nuevoEstado,
-      store_id: salon.store_id,
-    };
-
-    this.loungeService.updateLounge(salonActualizado).subscribe({
-      next: (response) => {
-        console.log('Estado cambiado:', response);
-        if (response.tipo === '1') {
-          this.cargarSalones();
+      error: (err) => {
+        console.error('Error al actualizar salón:', err);
+        if (err.status === 400) {
+          alert('Datos inválidos. Verifica los campos.');
+        } else if (err.status === 404) {
+          alert('Salón no encontrado.');
+        } else if (err.status === 409) {
+          alert('Ya existe un salón con ese nombre.');
+        } else {
+          alert('Error al actualizar el salón. Intenta nuevamente.');
         }
-      },
-      error: (err) => console.error('Error al cambiar estado:', err),
+      }
     });
-  }
-
-  // Helper para determinar si un salón está activo
-  esActivo(estado: string): boolean {
-    return estado === '1' || estado === 'ACTIVO' || estado === 'activo';
   }
 }

@@ -77,6 +77,19 @@
         </div>
       </div>
 
+      <!-- 3. Estado (Solo visible en modo edición) -->
+      <div *ngIf="mode === 'edit'" class="flex flex-col gap-2">
+        <label for="loungeState" class="font-semibold text-gray-300">Estado</label>
+        <p-select 
+          id="loungeState"
+          [options]="[{label: 'Activo', value: '1'}, {label: 'Inactivo', value: '0'}]" 
+          formControlName="state"
+          styleClass="w-full"
+          panelStyleClass="bg-[#1f242f] border border-gray-700 text-white"
+          class="w-full bg-[#111317] border border-gray-700 rounded-lg text-white"
+        ></p-select>
+      </div>
+
     </div>
   </form>
 
