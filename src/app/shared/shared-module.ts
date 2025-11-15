@@ -13,6 +13,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProductModal } from './product-modal/product-modal';
 import { CustomerModal } from './customer-modal/customer-modal';
+import { LoungeModal } from './lounge-modal/lounge-modal';
 
 
 
@@ -23,7 +24,8 @@ import { CustomerModal } from './customer-modal/customer-modal';
     CategoryCard,
     CategoryModal,
     ProductModal,
-    CustomerModal
+    CustomerModal,
+    LoungeModal
   ],
   imports: [
     CommonModule,

@@ -4,7 +4,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { providePrimeNG } from 'primeng/config';
 import { ButtonModule } from 'primeng/button';
 import Aura from '@primeuix/themes/aura';
-
+import { provideHttpClient } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 import { CoreModule } from './core/core-module';
@@ -19,9 +19,12 @@ import { CoreModule } from './core/core-module';
     ButtonModule,
     CoreModule,
     
+    
+    
   ],
   
   providers: [
+    provideHttpClient(),
     provideBrowserGlobalErrorListeners(),
      provideAnimationsAsync(),
         providePrimeNG({
