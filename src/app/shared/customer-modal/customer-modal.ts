@@ -1,8 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-// --- Interfaces para este modal ---
 
-/** Datos que el formulario emite al guardar */
 export interface CustomerFormData {
   name: string;
   email: string;
@@ -15,7 +13,6 @@ export interface CustomerFormData {
   state: string;
 }
 
-/** Datos que el modal recibe en modo 'edit' */
 export interface CustomerInitialData {
   name: string;
   email: string;
@@ -35,27 +32,15 @@ export interface CustomerInitialData {
   styleUrl: './customer-modal.scss',
 })
 export class CustomerModal implements OnChanges {
-
-  // --- ENTRADAS (Inputs) ---
   @Input() visible: boolean = false;
   @Input() mode: 'create' | 'edit' = 'create';
   @Input() initialData: CustomerInitialData | null = null;
   
-  // --- SALIDAS (Outputs) ---
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() save = new EventEmitter<CustomerFormData>();
 
-  // --- PROPIEDADES INTERNAS ---
   public customerForm: FormGroup;
   public headerTitle: string = 'Crear Cliente';
-  public typeDocumentOptions: any[] = [
-    { label: 'DNI', value: '1' },
-    { label: 'RUC', value: '2' },
-    { label: 'Carnet de Extranjería', value: '3' },
-    { label: 'Otro', value: '4' }
-  ];
-  
-  // Opciones para el Dropdown de Tipo de Documento
   public documentTypes: any[] = [
     { label: 'DNI', value: '1' },
     { label: 'RUC', value: '2' },
@@ -86,11 +71,9 @@ export class CustomerModal implements OnChanges {
   private setupModal(): void {
     if (this.mode === 'edit' && this.initialData) {
       this.headerTitle = 'Editar Cliente';
-      // Rellenamos el formulario con los datos iniciales
       this.customerForm.patchValue(this.initialData);
     } else {
       this.headerTitle = 'Crear Cliente';
-      // Reseteamos el formulario
       this.customerForm.reset({
         name: '',
         email: '',
@@ -107,7 +90,7 @@ export class CustomerModal implements OnChanges {
 
   public onSave(): void {
     if (this.customerForm.invalid) {
-      return; 
+      return;
     }
     
     this.save.emit(this.customerForm.value);

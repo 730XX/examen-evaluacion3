@@ -99,118 +99,31 @@ export class DetalleSubcategoria implements OnInit {
     this.cargarProductos(idSubcategoria);
   }
 
-  /**
-   * Obtiene la información detallada de la subcategoría por ID (GET)
-   */
   private cargarInfoSubcategoria(idSubcategoria: string): void {
     this.categoryService.getCategoryById(Number(idSubcategoria)).subscribe({
       next: (response) => {
-        console.log('Response info subcategoría:', response);
-        
         if (response && response.data) {
-          // La API devuelve {tipo, data: {...}, mensajes}
           this.subcategoriaInfo = response.data;
-          console.log('Información de subcategoría cargada:', this.subcategoriaInfo);
         }
       },
       error: (err) => {
-        console.error('Error al cargar información de subcategoría:', err);
       }
     });
   }
 
-  /**
-   * Carga los productos que pertenecen a esta subcategoría
-   */
   private cargarProductos(idSubcategoria: string): void {
-    // Llamamos al endpoint de productos con category_id = idSubcategoria
     this.productService.getProducts(undefined, undefined, idSubcategoria).subscribe({
       next: (response) => {
-        console.log('Response productos de subcategoría:', response);
-        
         if (response && response.data) {
-          // Filtramos productos que tengan category_id igual a la subcategoría
           this.productos = response.data.filter(
             (prod: Producto) => prod.category_id === idSubcategoria
           );
-          console.log('Productos de subcategoría cargados:', this.productos);
         }
       },
       error: (err) => {
-        console.error('Error al cargar productos de subcategoría:', err);
       }
     });
   }
-
-  private cargarDatosDeEjemplo_OLD(idSubcategoria: string | null): void {
-    // Solo cargamos datos si el ID es "4" (Bebidas Frias), como en tu ejemplo
-    if (idSubcategoria === '4') {
-      // Carga la información de la Subcategoría
-      this.subcategoriaInfo = {
-        category_id: '4',
-        category_name: 'Bebidas Frias',
-        category_categoryid: '1',
-        category_urlimage:
-          'https://res.cloudinary.com/dbqljhwdf/image/upload/v1752941764/pidemesa/imagenes/20250719/cloud-78d25b2489b4451a8f5852b076cbcfc9-normal.jpg',
-        category_state: '1',
-      };
-
-      // Carga los Productos de esta subcategoría
-      this.productos = [
-        {
-          product_id: '5',
-          product_name: 'Jarra - Limonada Frozen ',
-          product_price: '20.00',
-          product_stock: '16.00',
-          product_urlimage:
-            'https://res.cloudinary.com/dbqljhwdf/image/upload/v1749775808/pidemesa/imagenes/20250612/cloud-9db76b7614934067ac52df0b367a3254-normal.jpg',
-          product_state: '1',
-          category_id: '4',
-          product_needpreparation: '1',
-          product_creationdate: '2025-06-01 03:05:24',
-        },
-        {
-          product_id: '12',
-          product_name: 'Jarra - Chicha morada ',
-          product_price: '20.00',
-          product_stock: '8.00',
-          product_urlimage:
-            'https://res.cloudinary.com/dbqljhwdf/image/upload/v1750876114/pidemesa/imagenes/20250625/cloud-d0d413eb9c5f495cb6ffd0c9bacc8e25-normal.png',
-          product_state: '1',
-          category_id: '4',
-          product_needpreparation: '1',
-          product_creationdate: '2025-06-12 20:00:41',
-        },
-        {
-          product_id: '14',
-          product_name: 'Botella de 3L - Coca Cola',
-          product_price: '20.50',
-          product_stock: '19.00',
-          product_urlimage:
-            'https://res.cloudinary.com/dbqljhwdf/image/upload/v1750874954/pidemesa/imagenes/20250625/cloud-516523523d8d4ed289b4d939552fa7ba-normal.png',
-          product_state: '1',
-          category_id: '4',
-          product_needpreparation: '0',
-          product_creationdate: '2025-06-12 20:09:54',
-        },
-        // ... (el resto de tus productos)
-        {
-          product_id: '58',
-          product_name: '1 Botella - Vino Blanco',
-          product_price: '13.00',
-          product_stock: '17.00',
-          product_urlimage:
-            'https://res.cloudinary.com/dbqljhwdf/image/upload/v1750875913/pidemesa/imagenes/20250625/cloud-eb3e2b5b75b1481586c2783506eab1d8-normal.png',
-          product_state: '1',
-          category_id: '4',
-          product_needpreparation: '0',
-          product_creationdate: '2025-06-25 13:25:31',
-        },
-      ];
-    }
-  }
-
-   // --- Métodos que controlan el Modal de CATEGORÍA ---
 
   public showEditSubcategoryDialog(): void {
     if (!this.subcategoriaInfo) return; 

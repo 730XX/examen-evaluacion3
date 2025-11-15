@@ -74,186 +74,44 @@ export class DetalleCategoria implements OnInit {
     this.cargarProductosGenerales(idCategoria);
   }
 
-  /**
-   * Carga las subcategorías que pertenecen a esta categoría
-   */
   private cargarSubcategorias(idCategoria: string): void {
     this.categoryService.getCategories().subscribe({
       next: (response) => {
-        console.log('Response subcategorías:', response);
-        
         if (response && response.data) {
-          // Filtramos las que tengan category_categoryid igual al ID de la categoría actual
           this.subcategorias = response.data.filter(
             (cat: Subcategoria) => cat.category_categoryid === idCategoria
           );
-          console.log('Subcategorías cargadas:', this.subcategorias);
         }
       },
       error: (err) => {
-        console.error('Error al cargar subcategorías:', err);
       }
     });
   }
 
-  /**
-   * Carga los productos que pertenecen directamente a esta categoría (sin subcategoría)
-   */
   private cargarProductosGenerales(idCategoria: string): void {
-    // Llamamos al endpoint de productos con el category_id
     this.productService.getProducts(undefined, undefined, idCategoria).subscribe({
       next: (response) => {
-        console.log('Response productos:', response);
-        
         if (response && response.data) {
-          // Filtramos solo los que tienen el category_id correcto
           this.productosGenerales = response.data.filter(
             (prod: ProductoGeneral) => prod.category_id === idCategoria
           );
-          console.log('Productos generales cargados:', this.productosGenerales);
         }
       },
       error: (err) => {
-        console.error('Error al cargar productos:', err);
       }
     });
   }
 
-  private cargarDatosDeEjemplo_OLD(idCategoria: string | null): void {
-    if (idCategoria === '1') {
-      this.categoriaImageUrl = 'https://...url-categoria-principal.png'; 
-      this.subcategorias = [
-         {
-            "category_id": "4",
-            "category_name": "Bebidas Frias",
-            "category_categoryid": "1",
-            "category_urlimage": "https:\/\/res.cloudinary.com\/dbqljhwdf\/image\/upload\/v1752941764\/pidemesa\/imagenes\/20250719\/cloud-78d25b2489b4451a8f5852b076cbcfc9-normal.jpg",
-            "category_state": "1",
-            "cantidad_productos": "16"
-        },
-        {
-            "category_id": "17",
-            "category_name": "Bebidas Calientes",
-            "category_categoryid": "1",
-            "category_urlimage": "",
-            "category_state": "1",
-            "cantidad_productos": "0"
-        },
-        {
-            "category_id": "19",
-            "category_name": "Bebidas Tibias",
-            "category_categoryid": "1",
-            "category_urlimage": "",
-            "category_state": "1",
-            "cantidad_productos": "0"
-        }
-        // ...
-      ];
-      this.productosGenerales = [
-         {
-            "product_id": "1",
-            "product_name": "Agua cielo sin gas 625 ml",
-            "product_price": "2.00",
-            "product_stock": "-8.00",
-            "product_urlimage": "https:\/\/res.cloudinary.com\/dbqljhwdf\/image\/upload\/v1749922838\/pidemesa\/imagenes\/20250614\/cloud-afb75c63d95c4a4b9dfa34d180347f6d-normal.webp",
-            "product_state": "0",
-            "category_id": "1",
-            "product_needpreparation": "0",
-            "product_creationdate": "2025-05-30 02:28:53"
-        },
-        {
-            "product_id": "2",
-            "product_name": "Jarra de Jugo de Mango",
-            "product_price": "17.50",
-            "product_stock": "19.00",
-            "product_urlimage": "https:\/\/res.cloudinary.com\/dbqljhwdf\/image\/upload\/v1749923115\/pidemesa\/imagenes\/20250614\/cloud-c774f0c59fda4593be9747405444598e-normal.jpg",
-            "product_state": "1",
-            "category_id": "1",
-            "product_needpreparation": "1",
-            "product_creationdate": "2025-05-30 02:33:29"
-        },
-        {
-            "product_id": "10",
-            "product_name": "Inka Kola 1L",
-            "product_price": "5.00",
-            "product_stock": "-1.00",
-            "product_urlimage": "https:\/\/res.cloudinary.com\/dbqljhwdf\/image\/upload\/v1749775340\/pidemesa\/imagenes\/20250612\/cloud-5a7e7cffe61b4a80ad80a26e41e994d1-normal.png",
-            "product_state": "1",
-            "category_id": "1",
-            "product_needpreparation": "0",
-            "product_creationdate": "2025-06-12 19:37:00"
-        },
-        {
-            "product_id": "11",
-            "product_name": "Jarra de Jugo de Maracuy\u00e1",
-            "product_price": "17.90",
-            "product_stock": "19.00",
-            "product_urlimage": "https:\/\/res.cloudinary.com\/dbqljhwdf\/image\/upload\/v1749923440\/pidemesa\/imagenes\/20250614\/cloud-9ca85a45b05344e7b789ee73d5d35ad5-normal.jpg",
-            "product_state": "1",
-            "category_id": "1",
-            "product_needpreparation": "1",
-            "product_creationdate": "2025-06-12 19:57:00"
-        },
-        {
-            "product_id": "13",
-            "product_name": "Jarra de Limonada",
-            "product_price": "17.90",
-            "product_stock": "13.00",
-            "product_urlimage": "https:\/\/res.cloudinary.com\/dbqljhwdf\/image\/upload\/v1749776846\/pidemesa\/imagenes\/20250612\/cloud-b0f54f104c264bc29fa080213b5aebb5-normal.avif",
-            "product_state": "1",
-            "category_id": "1",
-            "product_needpreparation": "1",
-            "product_creationdate": "2025-06-12 20:06:13"
-        },
-        {
-            "product_id": "15",
-            "product_name": "Coca Cola 3L",
-            "product_price": "20.00",
-            "product_stock": "-4.00",
-            "product_urlimage": "https:\/\/res.cloudinary.com\/dbqljhwdf\/image\/upload\/v1750873823\/pidemesa\/imagenes\/20250625\/cloud-468bfe6b672b4b34b4e17659272037ba-normal.png",
-            "product_state": "1",
-            "category_id": "1",
-            "product_needpreparation": "0",
-            "product_creationdate": "2025-06-12 20:35:57"
-        },
-        {
-            "product_id": "16",
-            "product_name": "1 Botella - Cerveza Pilsen",
-            "product_price": "13.00",
-            "product_stock": "2.00",
-            "product_urlimage": "https:\/\/res.cloudinary.com\/dbqljhwdf\/image\/upload\/v1750876244\/pidemesa\/imagenes\/20250625\/cloud-42b651e322ec46bb836e9afe294e6d63-normal.png",
-            "product_state": "0",
-            "category_id": "1",
-            "product_needpreparation": "0",
-            "product_creationdate": "2025-06-12 20:44:26"
-        },
-        {
-            "product_id": "17",
-            "product_name": "Jarra de jugo de Naranja",
-            "product_price": "20.00",
-            "product_stock": "15.00",
-            "product_urlimage": "https:\/\/res.cloudinary.com\/dbqljhwdf\/image\/upload\/v1749923500\/pidemesa\/imagenes\/20250614\/cloud-dcdc79abadce4d7a847360eca74c916f-normal.webp",
-            "product_state": "0",
-            "category_id": "1",
-            "product_needpreparation": "1",
-            "product_creationdate": "2025-06-12 20:48:18"
-        }
-        // ...
-      ];
-    }
-  }
-
-  // --- Propiedades para controlar el Modal de CATEGORÍAS ---
   public modalVisible: boolean = false;
   public modalMode: 'create' | 'edit' = 'create';
   public dataToEdit: { id?: string; name: string; imageUrl: string } | null = null;
   public modalItemType: 'categoría' | 'subcategoría' = 'subcategoría';
 
-  // --- Propiedades para controlar el Modal de PRODUCTOS ---
   public productModalVisible: boolean = false;
   public productModalMode: 'create' | 'edit' = 'create';
   public productDataToEdit: ProductInitialData | null = null;
-  private currentEditingProductId: string | null = null; // Para saber qué ID editar
+  private currentEditingProductId: string | null = null;
+
 
   // --- Métodos que controlan el Modal de CATEGORÍAS ---
 

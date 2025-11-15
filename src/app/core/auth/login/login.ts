@@ -36,8 +36,6 @@ export class Login {
     this.authService.login(credentials).subscribe({
       next: (response) => {
         if (response.tipo === '1' && response.data) {
-          // Redirigir al dashboard
-          console.log('Login exitoso:', response);
           this.router.navigate(['/admin']);
         } else {
           this.errorMessage = response.mensajes[0] || 'Error al iniciar sesión';
@@ -45,7 +43,6 @@ export class Login {
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Error en login:', err);
         this.errorMessage = 'Correo o contraseña incorrectos';
         this.isLoading = false;
       },

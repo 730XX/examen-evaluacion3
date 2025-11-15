@@ -45,59 +45,38 @@ export class ListadoCategorias implements OnInit {
   
 
   /**
-   * Carga las categorías principales desde la API.
-   * Filtra solo las que tienen category_categoryid: "0" (son padres)
+   * Obtiene y filtra las categorías principales (padre sin categoría superior).
    */
   private cargarCategoriasPrincipales(): void {
-    // Llamada al servicio sin filtros (trae todas)
     this.categoryService.getCategories().subscribe({
       next: (response) => {
-        console.log('Response completo:', response);
-        
-        // La API devuelve {tipo, data, mensajes}
         if (response && response.data) {
-          // Filtramos solo las categorías principales (category_categoryid: "0")
           this.categoriasPrincipales = response.data.filter(
             (cat: CategoriaPrincipal) => cat.category_categoryid === '0'
           );
-          console.log('Categorías principales cargadas:', this.categoriasPrincipales);
         }
       },
       error: (err) => {
-        console.error('Error al cargar categorías:', err);
       }
     });
   }
 
-  // --- Métodos que controlan el Modal ---
-
-  /**
-   * Muestra el modal en modo 'Crear'.
-   * Es llamado por el botón "Crear Categoría".
-   */
-  
   public showCreateCategoryDialog(): void {
-    this.modalMode = 'create'; // Pone el modal en modo "Crear"
-    this.dataToEdit = null; // Borra datos de ediciones anteriores
-    this.modalVisible = true; // ¡Abre el modal!
+    this.modalMode = 'create';
+    this.dataToEdit = null;
+    this.modalVisible = true;
   }
 
-  /**
-   * Muestra el modal en modo 'Editar'.
-   * (Lo llamarías desde un botón de "editar" en la card)
-   * @param event El evento del mouse (para $event.stopPropagation())
-   * @param categoria La categoría a editar.
-   */
   public showEditCategoryDialog(event: MouseEvent, categoria: CategoriaPrincipal): void {
-    event.stopPropagation(); // Previene la navegación
+    event.stopPropagation();
     event.preventDefault();
 
-    this.modalMode = 'edit'; // Pone el modal en modo "Editar"
-    this.dataToEdit = { // Pasa los datos actuales
+    this.modalMode = 'edit';
+    this.dataToEdit = {
       name: categoria.category_name,
       imageUrl: categoria.category_urlimage
     };
-    this.modalVisible = true; // ¡Abre el modal!
+    this.modalVisible = true;
   }
 
   /**
@@ -112,11 +91,7 @@ export class ListadoCategorias implements OnInit {
     }
   }
 
-  /**
-   * Crea una nueva categoría principal
-   */
   private crearCategoria(formData: CategoryFormData): void {
-    // Validar duplicados antes de llamar a la API
     const nombreExistente = this.categoriasPrincipales.find(
       (cat) => cat.category_name.toLowerCase().trim() === formData.name.toLowerCase().trim()
     );
@@ -128,48 +103,30 @@ export class ListadoCategorias implements OnInit {
         detail: `Ya existe una categoría con el nombre "${formData.name}"`,
         life: 4000
       });
-      return; // No hace la petición a la API
+      return;
     }
 
-    // Si hay un archivo de imagen, necesitamos usar FormData
-    // Si no, podemos enviar JSON simple
-    
     if (formData.image) {
-      // TODO: Implementar subida de imagen con FormData
-      console.log('Creando categoría con imagen:', formData.image);
-      // const formDataToSend = new FormData();
-      // formDataToSend.append('category_name', formData.name);
-      // formDataToSend.append('category_categoryid', '0');
-      // formDataToSend.append('category_state', '1');
-      // formDataToSend.append('image', formData.image);
+      return;
     } else {
-      // Crear sin imagen
       const data = {
         category_name: formData.name,
-        category_categoryid: 0, // 0 = categoría principal
+        category_categoryid: 0,
         category_urlimage: '',
-        category_state: '1' // Activa por defecto
+        category_state: '1'
       };
 
       this.categoryService.createCategory(data).subscribe({
         next: (response) => {
-          console.log('Categoría creada exitosamente:', response);
-          
-          // Toast de éxito
           this.messageService.add({
             severity: 'success',
             summary: 'Categoría creada',
             detail: `La categoría "${formData.name}" fue creada exitosamente`,
             life: 3000
           });
-          
-          // Recargar la lista
           this.cargarCategoriasPrincipales();
         },
         error: (err) => {
-          console.error('Error al crear categoría:', err);
-          
-          // Toast de error con mensaje contextual
           let errorMsg = 'No se pudo crear la categoría';
           
           if (err.status === 409) {
@@ -191,23 +148,7 @@ export class ListadoCategorias implements OnInit {
     }
   }
 
-  /**
-   * Edita una categoría existente
-   */
   private editarCategoria(formData: CategoryFormData): void {
-    // TODO: Necesitarás pasar el ID de la categoría a editar
-    // Por ahora solo mostramos en consola
-    console.log('--- EDITANDO CATEGORÍA ---');
-    console.log('Nuevo Nombre:', formData.name);
-    console.log('Nueva URL de imagen:', formData.imageUrl);
-    
-    // Cuando implementes edición, el código sería algo así:
-    // const data = {
-    //   category_id: this.currentEditId,
-    //   category_name: formData.name,
-    //   category_urlimage: formData.imageUrl || '',
-    // };
-    // this.categoryService.updateCategory(data).subscribe(...);
   }
   
 }

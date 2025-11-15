@@ -13,7 +13,6 @@ export class CustomersService {
 
   constructor(private http: HttpClient) {}
 
-  // Obtener todos los clientes (POST con parámetros en URL)
   getCustomers(
     page: string = '-1',
     perPage: string = '-1',
@@ -21,7 +20,6 @@ export class CustomersService {
     customer_typedocument: string = '-1',
     customer_state: string = '1'
   ): Observable<any> {
-    // El interceptor agregará el token automáticamente
     let params = new HttpParams()
       .set('page', page)
       .set('perPage', perPage)
@@ -32,15 +30,11 @@ export class CustomersService {
     return this.http.post<any>(`${this.apiUrl}/getCustomers`, null, { params });
   }
 
-  // Crear cliente (POST)
   createCustomer(customer: any): Observable<any> {
-    // El interceptor agregará el token automáticamente
     return this.http.post(`${this.apiUrl}/customer`, customer);
   }
 
-  // Actualizar cliente (PUT)
   updateCustomer(customer: any): Observable<any> {
-    // El interceptor agregará el token automáticamente
     return this.http.put(`${this.apiUrl}/customer`, customer);
   }
 }

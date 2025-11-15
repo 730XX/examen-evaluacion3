@@ -1,21 +1,17 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-// --- Interfaces para este modal ---
 
-/** Datos que el formulario emite al guardar */
 export interface LoungeFormData {
   name: string;
   tableCount: number;
   state: string;
 }
 
-/** Datos que el modal recibe en modo 'edit' */
 export interface LoungeInitialData {
   name: string;
   tableCount: number;
   state: string;
 }
-
 
 @Component({
   selector: 'app-lounge-modal',
@@ -24,17 +20,13 @@ export interface LoungeInitialData {
   styleUrl: './lounge-modal.scss',
 })
 export class LoungeModal implements OnChanges {
-
-  // --- ENTRADAS (Inputs) ---
   @Input() visible: boolean = false;
   @Input() mode: 'create' | 'edit' = 'create';
   @Input() initialData: LoungeInitialData | null = null;
   
-  // --- SALIDAS (Outputs) ---
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() save = new EventEmitter<LoungeFormData>();
 
-  // --- PROPIEDADES INTERNAS ---
   public loungeForm: FormGroup;
   public headerTitle: string = 'Crear Salón';
 
@@ -52,7 +44,6 @@ export class LoungeModal implements OnChanges {
     }
   }
 
-  /** Obtiene el control tableCount para fácil acceso */
   get tableCountCtrl(): FormControl {
     return this.loungeForm.get('tableCount') as FormControl;
   }
@@ -71,12 +62,10 @@ export class LoungeModal implements OnChanges {
     }
   }
 
-  /** Incrementa el contador de mesas */
   public incrementTables(): void {
     this.tableCountCtrl.setValue(this.tableCountCtrl.value + 1);
   }
 
-  /** Decrementa el contador de mesas, con un mínimo de 0 */
   public decrementTables(): void {
     const currentValue = this.tableCountCtrl.value;
     if (currentValue > 0) {
@@ -86,7 +75,7 @@ export class LoungeModal implements OnChanges {
 
   public onSave(): void {
     if (this.loungeForm.invalid) {
-      return; 
+      return;
     }
     this.save.emit(this.loungeForm.value);
     this.closeModal();

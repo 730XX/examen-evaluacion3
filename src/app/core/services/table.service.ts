@@ -13,23 +13,18 @@ export class TableService {
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
-  // Obtener mesas por salón
   getTableeByLoungeId(loungeId: number, esGestion: number = 1): Observable<any> {
     return this.http.get<any>(`${this.url}/getTableeByLoungeId/${loungeId}/${esGestion}`);
   }
 
-  // Obtener mesa por ID
   getTableById(tableId: number): Observable<any> {
-    
     return this.http.get<any>(`${this.url}/tablee/${tableId}`);
   }
 
-  // Obtener todas las mesas
   getAllTables(): Observable<any> {
     return this.http.get<any>(`${this.url}/getTables`);
   }
 
-  // Actualizar/Editar mesa
   updateTable(data: any): Observable<any> {
     return this.http.put(`${this.url}/tablee`, data);
   }

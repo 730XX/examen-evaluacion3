@@ -11,17 +11,17 @@ export class SideBar {
     {
       title: 'Salones y Mesas',
       href: '/admin/salonesymesas',
-      icon: 'restaurant', // Icono de Google
+      icon: 'restaurant',
     },
     {
       title: 'Categorías y Productos',
       href: '/admin/listado-categorias-productos',
-      icon: 'category', // Icono de Google
+      icon: 'category',
     },
     {
       title: 'Clientes',
       href: '/admin/clientes',
-      icon: 'group', // Icono de Google
+      icon: 'group',
     },
   ];
 }

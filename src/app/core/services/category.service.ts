@@ -11,14 +11,12 @@ export class CategoryService {
 
   constructor(private http: HttpClient) {}
 
-  
   getCategories(
     category_name?: string,
     category_categoryid?: number,
     isGestion?: string,
     isPadre?: string
   ): Observable<any> {
-
     let params = new HttpParams();
     
     if (category_name) params = params.set('category_name', category_name);
@@ -29,19 +27,14 @@ export class CategoryService {
     return this.http.post<any>(`${this.apiUrl}/getCategories`, null, { params });
   }
 
-  // Obtener categoría por ID (GET)
   getCategoryById(categoryId: number): Observable<any> {
-
     return this.http.get<any>(`${this.apiUrl}/category/${categoryId}`);
   }
 
-  // Crear categoría/subcategoría (POST)
   createCategory(data: any): Observable<any> {
-    
     return this.http.post(`${this.apiUrl}/category`, data);
   }
 
-  // Actualizar categoría/subcategoría (PUT)
   updateCategory(data: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/category`, data);
   }

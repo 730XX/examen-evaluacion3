@@ -11,7 +11,6 @@ export class ProductService {
 
   constructor(private http: HttpClient) {}
 
-  // Obtener productos (POST con parámetros en URL)
   getProducts(
     product_name?: string,
     product_categoryid?: string,
@@ -20,7 +19,6 @@ export class ProductService {
     subcategory_id?: string,
     subcategory_name?: string
   ): Observable<any> {
-    
     let params = new HttpParams();
     
     if (product_name) params = params.set('product_name', product_name);
@@ -33,12 +31,10 @@ export class ProductService {
     return this.http.post<any>(`${this.apiUrl}/getProducts`, null, { params });
   }
 
-  // Crear producto (POST)
   createProduct(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/product`, data);
   }
 
-  // Actualizar producto (PUT)
   updateProduct(data: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/product`, data);
   }
