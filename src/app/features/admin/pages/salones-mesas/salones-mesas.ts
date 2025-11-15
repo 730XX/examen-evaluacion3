@@ -8,6 +8,7 @@ import { TableModel as Mesa, TableModel } from '../../../../core/interfaces/tabl
 import { LoungeService } from '../../../../core/services/lounge.service';
 import { TableService } from '../../../../core/services/table.service';
 import { LoungeFormData, LoungeInitialData } from '../../../../shared/lounge-modal/lounge-modal';
+import { MessageService } from 'primeng/api';
 
 
 @Component({
@@ -37,7 +38,11 @@ export class SalonesMesas implements OnInit {
   dataToEdit: LoungeInitialData | null = null;
   private currentEditingLoungeId: number | null = null;
 
-  constructor(private loungeService: LoungeService, private tableService: TableService) {}
+  constructor(
+    private loungeService: LoungeService,
+    private tableService: TableService,
+    private messageService: MessageService
+  ) {}
 
   ngOnInit(): void {
     this.cargarSalones();
@@ -142,6 +147,21 @@ export class SalonesMesas implements OnInit {
     console.log('Creando salón:', formData);
     const storeId = parseInt(localStorage.getItem('store_id') || '1', 10);
 
+    // Validar si ya existe un salón con el mismo nombre
+    const nombreDuplicado = this.salones.some(
+      s => s.lounge_name.toLowerCase().trim() === formData.name.toLowerCase().trim()
+    );
+
+    if (nombreDuplicado) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertencia',
+        detail: 'Ya existe un salón con ese nombre',
+        life: 4000
+      });
+      return;
+    }
+
     const nuevoSalon = {
       lounge_id: null, // null para crear nuevo
       lounge_name: formData.name,
@@ -154,22 +174,39 @@ export class SalonesMesas implements OnInit {
       next: (response) => {
         console.log('Salón creado exitosamente:', response);
         if (response.tipo === '1' || response.tipo === 'SUCCESS') {
+          this.messageService.add({
+            severity: 'success',
+            summary: '¡Éxito!',
+            detail: 'Salón creado correctamente',
+            life: 3000
+          });
           this.cargarSalones();
           this.modalVisible = false;
         } else {
-          console.error('Error en la respuesta:', response.mensajes);
-          alert(response.mensajes[0] || 'Error al crear salón');
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: response.mensajes[0] || 'Error al crear salón',
+            life: 4000
+          });
         }
       },
       error: (err) => {
         console.error('Error al crear salón:', err);
+        let errorMsg = 'Error al crear el salón. Intenta nuevamente.';
+        
         if (err.status === 400) {
-          alert('Datos inválidos. Verifica los campos.');
+          errorMsg = 'Datos inválidos. Verifica los campos.';
         } else if (err.status === 409) {
-          alert('Ya existe un salón con ese nombre.');
-        } else {
-          alert('Error al crear el salón. Intenta nuevamente.');
+          errorMsg = 'Ya existe un salón con ese nombre.';
         }
+        
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: errorMsg,
+          life: 4000
+        });
       }
     });
   }
@@ -183,6 +220,34 @@ export class SalonesMesas implements OnInit {
     const salonActual = this.salones.find(s => s.lounge_id === this.currentEditingLoungeId);
     if (!salonActual) return;
 
+    // Validar si realmente hay cambios
+    const sinCambios = 
+      salonActual.lounge_name === formData.name &&
+      salonActual.cantidad_mesas === formData.tableCount &&
+      salonActual.lounge_state === formData.state;
+
+    if (sinCambios) {
+      // No mostrar nada, solo cerrar el modal
+      this.modalVisible = false;
+      return;
+    }
+
+    // Validar si el nuevo nombre ya existe en otro salón
+    const nombreDuplicado = this.salones.some(
+      s => s.lounge_id !== this.currentEditingLoungeId &&
+           s.lounge_name.toLowerCase().trim() === formData.name.toLowerCase().trim()
+    );
+
+    if (nombreDuplicado) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertencia',
+        detail: 'Ya existe otro salón con ese nombre',
+        life: 4000
+      });
+      return;
+    }
+
     const salonActualizado = {
       lounge_id: this.currentEditingLoungeId,
       lounge_name: formData.name,
@@ -195,6 +260,12 @@ export class SalonesMesas implements OnInit {
       next: (response) => {
         console.log('Salón actualizado exitosamente:', response);
         if (response.tipo === '1' || response.tipo === 'SUCCESS') {
+          this.messageService.add({
+            severity: 'success',
+            summary: '¡Actualizado!',
+            detail: 'Salón modificado correctamente',
+            life: 3000
+          });
           this.cargarSalones();
           this.modalVisible = false;
           // Si hay un salón seleccionado y es el que editamos, actualizar
@@ -202,21 +273,32 @@ export class SalonesMesas implements OnInit {
             this.salonSeleccionado = null;
           }
         } else {
-          console.error('Error en la respuesta:', response.mensajes);
-          alert(response.mensajes[0] || 'Error al actualizar salón');
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: response.mensajes[0] || 'Error al actualizar salón',
+            life: 4000
+          });
         }
       },
       error: (err) => {
         console.error('Error al actualizar salón:', err);
+        let errorMsg = 'Error al actualizar el salón. Intenta nuevamente.';
+        
         if (err.status === 400) {
-          alert('Datos inválidos. Verifica los campos.');
+          errorMsg = 'Datos inválidos. Verifica los campos.';
         } else if (err.status === 404) {
-          alert('Salón no encontrado.');
+          errorMsg = 'Salón no encontrado.';
         } else if (err.status === 409) {
-          alert('Ya existe un salón con ese nombre.');
-        } else {
-          alert('Error al actualizar el salón. Intenta nuevamente.');
+          errorMsg = 'Ya existe un salón con ese nombre.';
         }
+        
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: errorMsg,
+          life: 4000
+        });
       }
     });
   }

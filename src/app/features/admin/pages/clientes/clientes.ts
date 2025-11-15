@@ -5,6 +5,7 @@ import { MessageService } from 'primeng/api';
 /**
  * Define la estructura de un Cliente (basado en tu API)
  */
+
 interface Customer {
   customer_id: string;
   customer_name: string;
@@ -12,11 +13,11 @@ interface Customer {
   customer_phone: string;
   customer_address: string;
   customer_country: string | null;
-  customer_typedocument: string; // "1" = DNI, "2" = RUC, etc.
+  customer_typedocument: string; 
   customer_numberdocument: string;
   customer_birthdate: string | null;
   customer_registrationdate: string | null;
-  customer_state: string; // "1" = Activo, "0" = Inactivo
+  customer_state: string; 
   user_id: string | null;
 }
 
@@ -30,7 +31,6 @@ export class Clientes implements OnInit {
   public clientes: Customer[] = [];
   public loadingClientes: boolean = false;
 
-  // --- Propiedades para controlar el Modal de Clientes ---
   public modalVisible: boolean = false;
   public modalMode: 'create' | 'edit' = 'create';
   public dataToEdit: any | null = null;
@@ -46,13 +46,8 @@ export class Clientes implements OnInit {
   }
 
   
-
-  /**
-   * Carga los clientes desde la API
-   */
   private cargarClientes(): void {
-    this.loadingClientes = true;
-    
+    this.loadingClientes = true;    
     // Llamar al servicio con los parámetros por defecto
     // page: '-1' = todos, perPage: '-1' = todos, customer_name: '-1' = todos
     // customer_typedocument: '-1' = todos, customer_state: '1' = solo activos
