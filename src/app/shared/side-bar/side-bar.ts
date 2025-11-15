@@ -23,10 +23,5 @@ export class SideBar {
       href: '/admin/clientes',
       icon: 'group', // Icono de Google
     },
-    {
-      title: 'Usuarios',
-      href: '/admin/usuarios', // Asumí esta ruta para "Usuarios"
-      icon: 'manage_accounts', // Icono de Google
-    },
   ];
 }

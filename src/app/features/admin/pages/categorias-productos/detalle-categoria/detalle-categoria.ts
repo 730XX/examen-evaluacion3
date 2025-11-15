@@ -1,11 +1,10 @@
 import { HttpParams } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core'; // <--- Añadido OnInit
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ProductFormData, ProductInitialData } from '../../../../../shared/product-modal/product-modal';
 import { CategoryFormData } from '../../../../../shared/category-modal/category-modal';
-
-// --- Importar interfaces de los DOS modales ---
-
+import { CategoryService } from '../../../../../core/services/category.service';
+import { ProductService } from '../../../../../core/services/product.service';
 
 interface Subcategoria {
   category_id: string;
@@ -34,7 +33,7 @@ interface ProductoGeneral {
   templateUrl: './detalle-categoria.html',
   styleUrl: './detalle-categoria.scss',
 })
-export class DetalleCategoria implements OnInit { // <--- Implementado OnInit
+export class DetalleCategoria implements OnInit {
 
   // Propiedades para almacenar los datos de la URL
   public categoriaId: string | null = null;
@@ -46,7 +45,9 @@ export class DetalleCategoria implements OnInit { // <--- Implementado OnInit
   public productosGenerales: ProductoGeneral[] = [];
 
   constructor(
-    private route: ActivatedRoute // Inyecta el servicio para leer la ruta activa
+    private route: ActivatedRoute,
+    private categoryService: CategoryService,
+    private productService: ProductService
   ) {}
 
   ngOnInit(): void {
@@ -54,11 +55,69 @@ export class DetalleCategoria implements OnInit { // <--- Implementado OnInit
     this.route.params.subscribe((params) => {
       this.categoriaId = params['id'];
       this.categoriaNombre = params['nombre'];
-      this.cargarDatosDeEjemplo(this.categoriaId);
+      this.cargarDatos(this.categoriaId);
     });
   }
 
-  private cargarDatosDeEjemplo(idCategoria: string | null): void {
+  /**
+   * Carga subcategorías y productos de la categoría actual desde la API
+   */
+  private cargarDatos(idCategoria: string | null): void {
+    if (!idCategoria) return;
+    
+    // Cargar subcategorías (category_categoryid = ID de la categoría padre)
+    this.cargarSubcategorias(idCategoria);
+    
+    // Cargar productos generales (sin subcategoría, solo con category_id)
+    this.cargarProductosGenerales(idCategoria);
+  }
+
+  /**
+   * Carga las subcategorías que pertenecen a esta categoría
+   */
+  private cargarSubcategorias(idCategoria: string): void {
+    this.categoryService.getCategories().subscribe({
+      next: (response) => {
+        console.log('Response subcategorías:', response);
+        
+        if (response && response.data) {
+          // Filtramos las que tengan category_categoryid igual al ID de la categoría actual
+          this.subcategorias = response.data.filter(
+            (cat: Subcategoria) => cat.category_categoryid === idCategoria
+          );
+          console.log('Subcategorías cargadas:', this.subcategorias);
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar subcategorías:', err);
+      }
+    });
+  }
+
+  /**
+   * Carga los productos que pertenecen directamente a esta categoría (sin subcategoría)
+   */
+  private cargarProductosGenerales(idCategoria: string): void {
+    // Llamamos al endpoint de productos con el category_id
+    this.productService.getProducts(undefined, undefined, idCategoria).subscribe({
+      next: (response) => {
+        console.log('Response productos:', response);
+        
+        if (response && response.data) {
+          // Filtramos solo los que tienen el category_id correcto
+          this.productosGenerales = response.data.filter(
+            (prod: ProductoGeneral) => prod.category_id === idCategoria
+          );
+          console.log('Productos generales cargados:', this.productosGenerales);
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar productos:', err);
+      }
+    });
+  }
+
+  private cargarDatosDeEjemplo_OLD(idCategoria: string | null): void {
     if (idCategoria === '1') {
       this.categoriaImageUrl = 'https://...url-categoria-principal.png'; 
       this.subcategorias = [
@@ -231,23 +290,57 @@ export class DetalleCategoria implements OnInit { // <--- Implementado OnInit
   public onModalSave(formData: CategoryFormData): void {
     if (this.modalItemType === 'subcategoría') {
       if (this.modalMode === 'create') {
-        console.log('--- CREANDO SUBCATEGORÍA ---');
-        console.log('Datos:', formData);
-        console.log('ID de categoría padre:', this.categoriaId); // Importante
-        // ... servicio POST ...
+        this.crearSubcategoria(formData);
       } else {
-        console.log('--- EDITANDO SUBCATEGORÍA ---');
-        console.log('ID a editar:', this.dataToEdit?.id);
-        console.log('Nuevos Datos:', formData);
-        // ... servicio PUT ...
+        this.editarSubcategoria(formData);
       }
     } else {
-      console.log('--- EDITANDO CATEGORÍA PRINCIPAL ---');
-      console.log('ID a editar:', this.dataToEdit?.id);
-      console.log('Nuevos Datos:', formData);
-      // ... servicio PUT ...
-      this.categoriaNombre = formData.name;
+      this.editarCategoriaPrincipal(formData);
     }
+  }
+
+  /**
+   * Crea una nueva subcategoría
+   */
+  private crearSubcategoria(formData: CategoryFormData): void {
+    const data = {
+      category_name: formData.name,
+      category_categoryid: this.categoriaId, // ID de la categoría padre
+      category_urlimage: formData.imageUrl || '',
+      category_state: '1'
+    };
+
+    this.categoryService.createCategory(data).subscribe({
+      next: (response) => {
+        console.log('Subcategoría creada exitosamente:', response);
+        // Recargar subcategorías
+        this.cargarSubcategorias(this.categoriaId!);
+      },
+      error: (err) => {
+        console.error('Error al crear subcategoría:', err);
+      }
+    });
+  }
+
+  /**
+   * Edita una subcategoría existente
+   */
+  private editarSubcategoria(formData: CategoryFormData): void {
+    // TODO: Implementar actualización
+    console.log('--- EDITANDO SUBCATEGORÍA ---');
+    console.log('ID a editar:', this.dataToEdit?.id);
+    console.log('Nuevos Datos:', formData);
+  }
+
+  /**
+   * Edita la categoría principal
+   */
+  private editarCategoriaPrincipal(formData: CategoryFormData): void {
+    // TODO: Implementar actualización
+    console.log('--- EDITANDO CATEGORÍA PRINCIPAL ---');
+    console.log('ID a editar:', this.dataToEdit?.id);
+    console.log('Nuevos Datos:', formData);
+    this.categoriaNombre = formData.name;
   }
 
   // --- Métodos que controlan el Modal de PRODUCTOS ---
@@ -284,16 +377,45 @@ export class DetalleCategoria implements OnInit { // <--- Implementado OnInit
    */
   public onProductModalSave(formData: ProductFormData): void {
     if (this.productModalMode === 'create') {
-      console.log('--- CREANDO PRODUCTO ---');
-      console.log('Datos:', formData);
-      console.log('Para Categoría ID:', this.categoriaId); // Producto general de la categoría padre
-      // ... servicio POST para crear producto ...
-
+      this.crearProducto(formData);
     } else {
-      console.log('--- EDITANDO PRODUCTO ---');
-      console.log('ID a editar:', this.currentEditingProductId);
-      console.log('Nuevos Datos:', formData);
-      // ... servicio PUT para actualizar producto ...
+      this.editarProducto(formData);
     }
+  }
+
+  /**
+   * Crea un nuevo producto general
+   */
+  private crearProducto(formData: ProductFormData): void {
+    const data = {
+      product_name: formData.name,
+      product_price: formData.price,
+      product_stock: formData.stock,
+      product_needpreparation: formData.needsPreparation ? '1' : '0',
+      category_id: this.categoriaId, // Producto pertenece a la categoría padre
+      product_urlimage: formData.image || '',
+      product_state: '1'
+    };
+
+    this.productService.createProduct(data).subscribe({
+      next: (response) => {
+        console.log('Producto creado exitosamente:', response);
+        // Recargar productos
+        this.cargarProductosGenerales(this.categoriaId!);
+      },
+      error: (err) => {
+        console.error('Error al crear producto:', err);
+      }
+    });
+  }
+
+  /**
+   * Edita un producto existente
+   */
+  private editarProducto(formData: ProductFormData): void {
+    // TODO: Implementar actualización
+    console.log('--- EDITANDO PRODUCTO ---');
+    console.log('ID a editar:', this.currentEditingProductId);
+    console.log('Nuevos Datos:', formData);
   }
 }
