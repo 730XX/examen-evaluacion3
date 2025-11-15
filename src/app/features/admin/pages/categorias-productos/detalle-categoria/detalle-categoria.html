@@ -1,0 +1,234 @@
+<!-- 
+  Contenedor principal con el fondo oscuro
+-->
+<div class="w-full h-full flex flex-col bg-[#111317] text-white">
+  
+  <!-- 
+    Barra de Título
+  -->
+  <div class="flex items-center justify-between p-4 border-b border-gray-700 flex-none">
+    <div class="flex items-center gap-4">
+      <!-- Botón Volver -->
+      <a 
+        [routerLink]="['/admin/listado-categorias-productos']"
+        class="text-gray-400 hover:text-white transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+      </a>
+      <!-- Título de la Categoría (dinámico) -->
+      <span class="text-2xl font-bold font-montserrat">
+        Categoría: <span class="text-[#3c82f5]">{{ categoriaNombre || 'Cargando...' }}</span>
+      </span>
+    </div>
+    
+    <!-- 
+      Botón "Editar Categoría"
+      - Llama al nuevo método 'showEditMainCategoryDialog'
+    -->
+    <button
+      (click)="showEditMainCategoryDialog()"
+      class="flex-none px-4 py-2 text-[#3c82f5] text-sm font-medium rounded-lg transition-colors cursor-pointer hover:bg-[#1f242f] hover:text-white"
+    >
+      Editar Categoría
+    </button>
+  </div>
+  
+  <!-- 
+    Área de Contenido
+  -->
+  <div class="flex-1 p-4 overflow-y-auto flex flex-col gap-8">
+    
+    <!-- 
+      SECCIÓN 1: Subcategorías (en Cards)
+    -->
+    <div>
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-white">Subcategorías</h2>
+        
+        <!-- 
+          Botón "Crear Subcategoría"
+          - Llama al nuevo método 'showCreateSubcategoryDialog'
+        -->
+        <button
+          (click)="showCreateSubcategoryDialog()"
+          class="flex-none px-4 py-2 bg-[#3c82f5] text-white text-sm font-medium rounded-lg hover:bg-[#5a9aff] transition-colors"
+        >
+          Crear Subcategoría
+        </button>
+      </div>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        
+        <!-- 
+          Card de Subcategoría (clickable)
+          - Ahora contiene un botón de editar
+        -->
+        <div 
+          *ngFor="let sub of subcategorias" 
+          class="bg-[#1f242f] rounded-lg shadow-md transition-all border-2 border-transparent hover:border-[#3c82f5]"
+        >
+          <app-category-card
+            [title]="sub.category_name"
+            [count]="sub.cantidad_productos"
+            [routerPath]="['./subcategorias', sub.category_id, sub.category_name]"
+          >
+          </app-category-card>
+          
+          <!-- 
+            Botón de Editar para la Subcategoría
+            - Se añade al footer de la card
+          -->
+          <!-- <div class="p-4 pt-0">
+            <button
+              (click)="showEditSubcategoryDialog($event, sub)"
+              class="w-full text-center px-3 py-2 text-sm font-medium text-gray-300 bg-[#252b38] rounded-md hover:bg-[#3c82f5] hover:text-white transition-colors"
+            >
+              Editar
+            </button>
+          </div> -->
+        </div>
+
+      </div>
+      <!-- Mensaje si no hay subcategorías -->
+      @if (subcategorias.length === 0) {
+        <div class="p-4 text-center text-gray-500">No hay subcategorías.</div>
+      }
+    </div>
+
+    <!-- 
+      SECCIÓN 2: Productos Generales (en Tabla)
+    -->
+    <div>
+      <!-- Barra de acciones de la tabla -->
+      <div class="flex items-center justify-between gap-4 mb-4">
+        <h2 class="text-xl font-bold text-white">Productos Generales (sin subcategoría)</h2>
+        <div class="flex gap-4">
+          <!-- Buscador -->
+          <input
+            type="text"
+            placeholder="Buscar productos..."
+            class="w-full md:w-72 px-4 py-2 bg-[#1f242f] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#3c82f5] transition-colors"
+          />
+          <!-- Botón Crear Producto -->
+          <button
+            (click)="showCreateProductDialog()"
+            class="flex-none px-4 py-2 bg-[#3c82f5] text-white text-sm font-medium rounded-lg hover:bg-[#5a9aff] transition-colors"
+          >
+            Crear Producto
+          </button>
+        </div>
+      </div>
+
+      <!-- Contenedor de la Tabla (sin cambios) -->
+      <div class="bg-[#1f242f] rounded-lg shadow-md overflow-hidden">
+        <table class="w-full">
+          <thead class="bg-[#151a23]">
+            <tr>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
+              >
+                Producto
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
+              >
+                Stock
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
+              >
+                Precio
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
+              >
+                Estado
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
+              >
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-700">
+            <!-- Fila de Producto -->
+            <tr *ngFor="let prod of productosGenerales" class="hover:bg-[#252b38] transition-colors">
+              <!-- Columna: Producto (Imagen y Nombre) -->
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
+                <div class="flex items-center gap-3">
+                  <img
+                    [src]="prod.product_urlimage || 'https://placehold.co/40x40/1f242f/FFF?text=P'"
+                    alt="{{ prod.product_name }}"
+                    class="w-10 h-10 rounded-md object-cover"
+                  />
+                  <span>{{ prod.product_name }}</span>
+                </div>
+              </td>
+
+              <!-- Columna: Stock -->
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                Quedan {{ prod.product_stock }} und.
+              </td>
+
+              <!-- Columna: Precio -->
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                S/ {{ prod.product_price }}
+              </td>
+
+              <!-- Columna: Estado -->
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                <span
+                  class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full"
+                  [ngClass]="
+                    prod.product_state === '1'
+                      ? 'bg-green-600 text-green-100'
+                      : 'bg-red-600 text-red-100'
+                  "
+                >
+                  {{ prod.product_state === '1' ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+
+              <!-- Columna: Acciones -->
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                <button
+                  (click)="showEditProductDialog(prod)"
+                 class="text-[#3c82f5] hover:text-[#5a9aff] mr-3 transition-colors">
+                  Editar
+                </button>
+                <button class="text-red-500 hover:text-red-400 transition-colors">Eliminar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Mensaje si no hay productos generales -->
+      @if (productosGenerales.length === 0) {
+        <div class="p-4 text-center text-gray-500">No hay productos generales en esta categoría.</div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- 
+  MODAL REUTILIZABLE
+  - Lo conectamos a las variables de este componente.
+  - El [itemType] ahora es dinámico.
+-->
+<app-category-modal
+  [(visible)]="modalVisible"
+  [mode]="modalMode"
+  [itemType]="modalItemType"
+  [initialData]="dataToEdit"
+  (save)="onModalSave($event)"
+></app-category-modal>
+
+<app-product-modal
+  [(visible)]="productModalVisible"
+  [mode]="productModalMode"
+  [initialData]="productDataToEdit"
+  (save)="onProductModalSave($event)"
+></app-product-modal>

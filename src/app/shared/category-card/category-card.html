@@ -1,0 +1,16 @@
+<!-- 
+  - El bucle *ngFor se quita (el padre lo hará).
+  - [routerLink] ahora usa la variable 'routerPath'.
+  - Las interpolaciones {{ ... }} usan 'title' y 'count'.
+-->
+<a 
+  [routerLink]="routerPath"
+  class="block p-6 bg-[#1f242f] rounded-lg shadow-md transition-all cursor-pointer border-4 border-transparent hover:border-[#3c82f5] hover:shadow-lg border-b-[#3c82f5]"
+>
+  <div class="flex justify-between items-center">
+    <h3 class="text-lg font-semibold text-white truncate">{{ title }}</h3>
+    <span class="text-sm text-gray-400">
+      {{ count }} prod.
+    </span>
+  </div>
+</a>

@@ -3,8 +3,7 @@
   - Añadido 'w-full h-full' para que ocupe todo el espacio del <main>.
   - Añadido 'flex flex-col' para ordenar el título y el contenido.
 -->
-<div class="w-full h-full flex flex-col bg-[#222f42] text-white">
-  
+<div class="w-full h-full flex flex-col bg-[#111317] text-white">
   <!-- 
     - Añadido 'border-b' y 'border-gray-700' para la línea divisoria.
   -->
@@ -19,7 +18,6 @@
     - 'overflow-hidden': Evita el scroll en este nivel.
   -->
   <div class="flex-1 flex gap-4 p-4 overflow-hidden">
-    
     <!-- 
       CAMBIO 4: 
       - Columna de Salones.
@@ -27,13 +25,13 @@
       - 'border-r border-gray-700': Línea divisoria vertical.
       - 'pr-4': Padding a la derecha.
     -->
-    <div class="w-96 flex flex-col gap-4 pr-4 border-r border-gray-700 flex-none overflow-y-auto ">
-        <h2 class="text-xl font-bold pb-4 text-white border-b border-gray-700">Listado de Salones</h2>
+    <div class="w-96 flex flex-col gap-4 pr-4 border-r border-gray-700 flex-none overflow-y-auto">
+      <h2 class="text-xl font-bold pb-4 text-white border-b border-gray-700">Listado de Salones</h2>
       <div
-        class="p-4 bg-[#1e2a3b] rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+        class="p-4 bg-[#1f242f] rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer border-2"
         *ngFor="let salon of salones"
         (click)="seleccionarSalon(salon)"
-        [ngClass]="{'border-2 border-blue-500': salon === salonSeleccionado}"
+        [ngClass]="salon === salonSeleccionado ? 'border-[#3c82f5]' : 'border-transparent'"
       >
         <h3 class="text-lg font-semibold mb-2 text-white">{{ salon.nombre }}</h3>
         <p class="text-sm text-gray-300">Mesas: {{ salon.mesas.length }}</p>
@@ -48,19 +46,64 @@
     -->
     <div class="flex-1 flex flex-col gap-4 overflow-y-auto">
       <div *ngIf="salonSeleccionado">
-        <h2 class="text-xl font-bold mb-4 text-white">Mesas en {{ salonSeleccionado.nombre }}</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div
-            class="p-4 bg-[#1e2a3b] rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
-            *ngFor="let mesa of salonSeleccionado.mesas"
-            (click)="seleccionarMesa(mesa)"
-
-            [ngClass]="{'border-2 border-green-500': mesa === mesaSeleccionada}"
-          >
-            <h3 class="text-lg font-semibold mb-2 text-white">Mesa {{ mesa.numero }}</h3>
-            <p class="text-sm text-gray-300">Capacidad: {{ mesa.capacidad }}</p>
-            <p class="text-sm text-gray-300">Estado: {{ mesa.estado }}</p>
-          </div>
+        <h2 class="text-xl font-bold mb-4 text-white">
+          Mesas en
+          <span class="text-[#3c83f6]">
+            {{ salonSeleccionado.nombre }}
+          </span>
+        </h2>
+        
+        <!-- Tabla de mesas -->
+        <div class="bg-[#1f242f] rounded-lg shadow-md overflow-hidden">
+          <table class="w-full">
+            <thead class="bg-[#151a23]">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  Mesa
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  Acciones
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-700">
+              <tr 
+                *ngFor="let mesa of salonSeleccionado.mesas"
+                class="hover:bg-[#252b38] transition-colors cursor-pointer"
+                [ngClass]="{ 'bg-[#2a3f5f]': mesa === mesaSeleccionada }"
+                (click)="seleccionarMesa(mesa)"
+              >
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
+                  Mesa {{ mesa.numero }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                  <span 
+                    class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full"
+                    
+                  >
+                    
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  <button 
+                    class="text-[#3c82f5] hover:text-[#5a9aff] mr-3 transition-colors"
+                    (click)="$event.stopPropagation(); seleccionarMesa(mesa)"
+                  >
+                    Ver detalles
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
       <div *ngIf="!salonSeleccionado" class="flex items-center justify-center h-full">

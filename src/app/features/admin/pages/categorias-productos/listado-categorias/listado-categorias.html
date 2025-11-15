@@ -1,0 +1,78 @@
+<!-- 
+  Contenedor principal
+-->
+<div class="w-full h-full flex flex-col bg-[#111317] text-white">
+  
+  <!-- 
+    Barra de Título
+  -->
+  <div class="flex items-center p-4 border-b border-gray-700 flex-none">
+    <span class="text-2xl font-bold font-montserrat">Categorías y Productos</span>
+  </div>
+
+  <!-- 
+    Barra de Acciones (Buscador y Botón)
+  -->
+  <div class="flex items-center justify-between gap-4 p-4 border-b border-gray-700 flex-none">
+    <!-- Buscador -->
+    <input 
+      type="text"
+      placeholder="Buscar categorías..."
+      class="w-full md:w-1/3 px-4 py-2 bg-[#1f242f] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#3c82f5] transition-colors"
+    >
+    <!-- 
+      Botón Crear
+      - (click) llama al nuevo método en el TS
+      - He quitado el 'label="Show"' que sobraba
+    -->
+    <button 
+      (click)="showCreateCategoryDialog()"
+      class="flex-none px-4 py-2 bg-[#3c82f5] text-white text-sm font-medium rounded-lg hover:bg-[#5a9aff] transition-colors"
+    >
+      Crear Categoría
+    </button>
+  </div>
+
+  <!-- 
+    Área de Contenido (Cuadrícula de Categorías)
+  -->
+  <div class="flex-1 p-4 overflow-y-auto">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      
+      <!-- Card reutilizable (sin cambios) -->
+      <app-category-card
+        *ngFor="let categoria of categoriasPrincipales"
+        [title]="categoria.category_name"
+        [count]="categoria.cantidad_productos"
+        [routerPath]="['./categoria', categoria.category_id, categoria.category_name]"
+      >
+        <!-- 
+          ( Opcional: 
+            Aquí podrías poner un botón de editar que llame a
+            showEditCategoryDialog($event, categoria) 
+          )
+        -->
+      </app-category-card>
+
+      <!-- 
+        ¡¡CORREGIDO!!
+        El <div class="card flex justify-center">...</div>
+        SE ELIMINA DE AQUÍ. El modal ya no vive en la cuadrícula.
+      -->
+
+    </div>
+  </div>
+</div>
+
+<!-- 
+  ¡¡AQUÍ ES CÓMO SE USA EL MODAL REUTILIZABLE!!
+  - Se pone UNA VEZ, al final del archivo.
+  - Se conecta a las variables del archivo .ts
+-->
+<app-category-modal
+  [(visible)]="modalVisible"
+  [mode]="modalMode"
+  [itemType]="'categoría'"
+  [initialData]="dataToEdit"
+  (save)="onModalSave($event)"
+></app-category-modal>

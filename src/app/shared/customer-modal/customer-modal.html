@@ -1,0 +1,137 @@
+<p-dialog
+  [(visible)]="visible"
+  (onHide)="closeModal()"
+  [modal]="true"
+  [style]="{ width: '50rem' }"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+  [draggable]="false"
+  [maximizable]="true"
+  contentStyleClass="bg-[#1f242f] text-white p-6"
+>
+  <!-- 
+    Header Personalizado
+  -->
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-2 bg-[#1f242f] text-white">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#3c82f5]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span class="text-xl font-bold">{{ headerTitle }}</span>
+    </div>
+  </ng-template>
+
+  <!-- 
+    Contenido del Formulario
+  -->
+  <form [formGroup]="customerForm" (ngSubmit)="onSave()">
+    <!-- Layout de 2 columnas -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Columna 1: Nombre -->
+      <div class="flex flex-col gap-2">
+        <label for="customerName" class="font-semibold text-gray-300">Nombre del Cliente</label>
+        <input 
+          pInputText 
+          id="customerName" 
+          formControlName="name"
+          placeholder="Ejm: Cliente 1"
+          class="w-full bg-[#111317] border border-gray-700 rounded-lg text-white p-3 placeholder-gray-500 focus:outline-none focus:border-[#3c82f5] transition-colors"
+        />
+      </div>
+
+      <!-- Columna 2: Teléfono -->
+      <div class="flex flex-col gap-2">
+        <label for="customerPhone" class="font-semibold text-gray-300">Teléfono del Cliente</label>
+        <input 
+          pInputText 
+          id="customerPhone" 
+          formControlName="phone"
+          placeholder="Ejm: 999999999"
+          class="w-full bg-[#111317] border border-gray-700 rounded-lg text-white p-3 placeholder-gray-500 focus:outline-none focus:border-[#3c82f5] transition-colors"
+        />
+      </div>
+
+      <!-- Columna 1: Tipo de Documento -->
+      <div class="flex flex-col gap-2">
+        <label for="customerTypeDoc" class="font-semibold text-gray-300">Tipo de documento</label>
+        <p-select 
+          id="customerTypeDoc"
+          [options]="typeDocumentOptions" 
+          formControlName="typeDocument"
+          styleClass="w-full"
+          panelStyleClass="bg-[#1f242f] border border-gray-700 text-white"
+          class="w-full bg-[#111317] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#3c82f5] transition-colors"
+        ></p-select>
+      </div>
+
+      <!-- Columna 2: Número de Documento -->
+      <div class="flex flex-col gap-2">
+        <label for="customerNumDoc" class="font-semibold text-gray-300">Número de documento</label>
+        <input 
+          pInputText 
+          id="customerNumDoc" 
+          formControlName="numberDocument"
+          placeholder="Ejm: 99999999"
+          class="w-full bg-[#111317] border border-gray-700 rounded-lg text-white p-3 placeholder-gray-500 focus:outline-none focus:border-[#3c82f5] transition-colors"
+        />
+      </div>
+
+      <!-- Fila Completa: Correo -->
+      <div class="flex flex-col gap-2 md:col-span-2">
+        <label for="customerEmail" class="font-semibold text-gray-300">Correo del Cliente</label>
+        <input 
+          pInputText 
+          id="customerEmail" 
+          type="email"
+          formControlName="email"
+          placeholder="Ejm: example@gmail.com"
+          class="w-full bg-[#111317] border border-gray-700 rounded-lg text-white p-3 placeholder-gray-500 focus:outline-none focus:border-[#3c82f5] transition-colors"
+        />
+      </div>
+      
+       <!-- Fila Completa: Dirección (Opcional, de tu JSON) -->
+      <div class="flex flex-col gap-2 md:col-span-2">
+        <label for="customerAddress" class="font-semibold text-gray-300">Dirección (Opcional)</label>
+        <input 
+          pInputText 
+          id="customerAddress" 
+          formControlName="address"
+          placeholder="Ejm: Av. Siempre Viva 123"
+          class="w-full bg-[#111317] border border-gray-700 rounded-lg text-white p-3 placeholder-gray-500 focus:outline-none focus:border-[#3c82f5] transition-colors"
+        />
+      </div>
+
+    </div>
+  </form>
+
+  <!-- 
+    Footer
+  -->
+  <ng-template pTemplate="footer">
+    <div classT="w-full flex justify-end gap-3 bg-[#1f242f] pt-4">
+      <button 
+        pButton 
+        label="Cancelar"
+        (click)="closeModal()"
+        class="p-button-text text-gray-300 hover:bg-gray-700"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+        </svg>
+        
+      </button>
+      <button 
+        pButton 
+        [label]="mode === 'create' ? '' : ''"
+        (click)="onSave()"
+        [disabled]="customerForm.invalid"
+        class="bg-[#3c82f5] border-transparent text-white hover:bg-[#5a9aff] transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z" />
+        </svg>
+        {{ mode === 'create' ? 'Guardar cambios' : 'Actualizar cambios' }}
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>

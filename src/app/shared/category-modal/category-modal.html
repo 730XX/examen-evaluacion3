@@ -1,0 +1,118 @@
+<p-dialog
+  [(visible)]="visible"
+  (onHide)="closeModal()"
+  [modal]="true"
+  [style]="{ width: '50rem' }"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+  [draggable]="false"
+  [maximizable]="true"
+  contentStyleClass="bg-[#1f242f] text-white p-6"
+>
+  <!-- 
+    Header Personalizado (Título dinámico)
+  -->
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-2 bg-[#1f242f] text-white">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#3c82f5]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <!-- Título ahora es dinámico -->
+      <span class="text-xl font-bold">{{ headerTitle }}</span>
+    </div>
+  </ng-template>
+
+  <!-- 
+    Contenido del Formulario (con Reactive Forms)
+  -->
+  <form [formGroup]="categoryForm" (ngSubmit)="onSave()">
+    <div class="flex flex-col gap-6">
+      
+      <!-- 1. Nombre de la categoría -->
+      <div class="flex flex-col gap-2">
+        <label for="categoryName" class="font-semibold text-gray-300">Nombre de la {{ itemType }}</label>
+        <input 
+          pInputText 
+          id="categoryName" 
+          formControlName="name"
+          placeholder="Ejm: Terraza"
+          class="w-full bg-[#111317] border border-gray-700 rounded-lg text-white p-3 placeholder-gray-500 focus:outline-none focus:border-[#3c82f5] transition-colors"
+        />
+      </div>
+
+      <!-- 2. Sube una imagen -->
+      <div class="flex flex-col gap-3">
+        <label class="font-semibold text-gray-300 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+          </svg>
+          Sube una imagen
+        </label>
+        
+        <!-- Info Box (Sin cambios) -->
+        <div class="bg-[#111317] border border-gray-700 rounded-lg p-3 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+          </svg>
+          <p class="text-sm text-gray-400">
+            Recomendamos usar una resolución de 800 x 420 px
+          </p>
+        </div>
+
+        <!-- Zona de Carga con Vista Previa -->
+        <label class="flex flex-col items-center justify-center p-8 bg-[#111317] border-2 border-dashed border-gray-700 rounded-lg cursor-pointer hover:border-gray-500 transition-colors">
+          
+          <!-- Muestra la imagen de vista previa si existe -->
+          @if (imagePreviewUrl) {
+            <img [src]="imagePreviewUrl" alt="Vista previa" class="max-h-32 rounded-lg object-contain mb-4">
+          } @else {
+            <!-- Icono de Nube (SVG) -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-500 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+          }
+          
+          <span class="font-semibold text-gray-300">
+            {{ selectedFile ? selectedFile.name : 'Da clic para subir una imagen' }}
+          </span>
+          <span class="text-sm text-gray-500">JPG o PNG (800 x 420 px)</span>
+          
+          <input type="file" class="hidden" (change)="onFileSelect($event)" accept="image/png, image/jpeg" />
+        </label>
+      </div>
+    </div>
+  </form>
+
+  <!-- 
+    Footer Personalizado (Los botones ahora están fuera del form)
+  -->
+  <ng-template pTemplate="footer">
+    <div classT="w-full flex justify-end gap-3 bg-[#1f242f] pt-4">
+      <!-- Botón Cancelar -->
+      <button 
+        pButton 
+        label="Cancelar"
+        (click)="closeModal()"
+        class="p-button-text text-gray-300 hover:bg-gray-700"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+        </svg>
+        
+      </button>
+
+      <!-- Botón Guardar Cambios (disparador del submit del form) -->
+      <button 
+        pButton 
+        [label]="mode === 'create' ? '' : ''"
+        (click)="onSave()"
+        [disabled]="categoryForm.invalid"
+        class="bg-[#3c82f5] border-transparent text-white hover:bg-[#5a9aff] transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z" />
+        </svg>
+        {{ mode === 'create' ? 'Guardar cambios' : 'Actualizar cambios' }}
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>

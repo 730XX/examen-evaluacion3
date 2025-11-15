@@ -4,6 +4,9 @@ import { Admin } from './admin';
 import { SalonesMesas } from './pages/salones-mesas/salones-mesas';
 import { CategoriasProductos } from './pages/categorias-productos/categorias-productos';
 import { Clientes } from './pages/clientes/clientes';
+import { ListadoCategorias } from './pages/categorias-productos/listado-categorias/listado-categorias';
+import { DetalleCategoria } from './pages/categorias-productos/detalle-categoria/detalle-categoria';
+import { DetalleSubcategoria } from './pages/categorias-productos/detalle-subcategoria/detalle-subcategoria';
 
 const routes: Routes = [
   // --- RUTAS ANIDADAS ---
@@ -17,9 +20,30 @@ const routes: Routes = [
         path: 'salonesymesas', // -> admin/salonesymesas
         component: SalonesMesas
       },
+      
+      // --- Flujo de Rutas: Categorías y Productos ---
       {
-        path: 'categoriasyproductos', // -> admin/categoriasyproductos
-        component: CategoriasProductos
+        path: 'listado-categorias-productos', // -> /admin/listado-categorias-productos
+        component: CategoriasProductos, // Carga el "Wrapper" (el que solo tiene <router-outlet>)
+        children: [
+          {
+            // Página 1: Listado de Categorías Principales
+            path: '', // Coincide con /admin/listado-categorias-productos
+            component: ListadoCategorias
+          },
+          {
+            // Página 2: Detalle de Categoría (muestra Subcategorías)
+            // Coincide con /admin/listado-categorias-productos/categoria/1/Bebidas
+            path: 'categoria/:id/:nombre', 
+            component: DetalleCategoria
+          },
+          {
+            // Página 3: Detalle de Subcategoría (muestra Productos)
+            // Coincide con /admin/listado-categorias-productos/categoria/1/Bebidas/subcategorias/4/Bebidas Frias
+            path: 'categoria/:id/:nombre/subcategorias/:subId/:subNombre',
+            component: DetalleSubcategoria
+          }
+        ]
       },
       {
         path: 'clientes', // -> admin/clientes

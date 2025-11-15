@@ -2,10 +2,10 @@
   <!-- 
     1. Navbar (Fija en la parte superior)
   -->
-  <app-nav-bar></app-nav-bar>
+  <!-- <app-nav-bar></app-nav-bar> -->
 
   <!-- Contenedor del Sidebar y el Contenido Principal -->
-  <div class="flex flex-1 overflow-hidden pt-16">
+  <div class="flex flex-1 overflow-hidden">
     <!-- 
       2. Sidebar (Fija a la izquierda)
       Debe tener una altura definida (h-full) para estirarse en el contenedor flex-1.
@@ -15,7 +15,7 @@
     <!-- 
       3. Contenido Principal (Ajustado)
     -->
-    <main class="flex-1 w-full overflow-y-auto p-1">
+    <main class="flex-1 w-full overflow-y-auto">
       <!-- Contenido de las páginas cambia segun la ruta -->
       <router-outlet></router-outlet>
     </main>
