@@ -1,0 +1,71 @@
+<!-- 
+  CAMBIO 1: 
+  - Añadido 'w-full h-full' para que ocupe todo el espacio del <main>.
+  - Añadido 'flex flex-col' para ordenar el título y el contenido.
+-->
+<div class="w-full h-full flex flex-col bg-[#222f42] text-white">
+  
+  <!-- 
+    - Añadido 'border-b' y 'border-gray-700' para la línea divisoria.
+  -->
+  <div class="flex items-center p-4 border-b border-gray-700 flex-none">
+    <span class="text-2xl font-bold font-montserrat">Salones y Mesas</span>
+  </div>
+
+  <!-- 
+    CAMBIO 3: 
+    - Contenedor principal de salones y mesas.
+    - 'flex-1': Ocupa todo el espacio restante.
+    - 'overflow-hidden': Evita el scroll en este nivel.
+  -->
+  <div class="flex-1 flex gap-4 p-4 overflow-hidden">
+    
+    <!-- 
+      CAMBIO 4: 
+      - Columna de Salones.
+      - 'overflow-y-auto': Permite scroll SÓLO en esta columna.
+      - 'border-r border-gray-700': Línea divisoria vertical.
+      - 'pr-4': Padding a la derecha.
+    -->
+    <div class="w-96 flex flex-col gap-4 pr-4 border-r border-gray-700 flex-none overflow-y-auto ">
+        <h2 class="text-xl font-bold pb-4 text-white border-b border-gray-700">Listado de Salones</h2>
+      <div
+        class="p-4 bg-[#1e2a3b] rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+        *ngFor="let salon of salones"
+        (click)="seleccionarSalon(salon)"
+        [ngClass]="{'border-2 border-blue-500': salon === salonSeleccionado}"
+      >
+        <h3 class="text-lg font-semibold mb-2 text-white">{{ salon.nombre }}</h3>
+        <p class="text-sm text-gray-300">Mesas: {{ salon.mesas.length }}</p>
+      </div>
+    </div>
+
+    <!-- 
+      CAMBIO 6: 
+      - Columna de Mesas.
+      - 'flex-1': Ocupa el espacio restante.
+      - 'overflow-y-auto': Permite scroll SÓLO en esta columna.
+    -->
+    <div class="flex-1 flex flex-col gap-4 overflow-y-auto">
+      <div *ngIf="salonSeleccionado">
+        <h2 class="text-xl font-bold mb-4 text-white">Mesas en {{ salonSeleccionado.nombre }}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div
+            class="p-4 bg-[#1e2a3b] rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+            *ngFor="let mesa of salonSeleccionado.mesas"
+            (click)="seleccionarMesa(mesa)"
+
+            [ngClass]="{'border-2 border-green-500': mesa === mesaSeleccionada}"
+          >
+            <h3 class="text-lg font-semibold mb-2 text-white">Mesa {{ mesa.numero }}</h3>
+            <p class="text-sm text-gray-300">Capacidad: {{ mesa.capacidad }}</p>
+            <p class="text-sm text-gray-300">Estado: {{ mesa.estado }}</p>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="!salonSeleccionado" class="flex items-center justify-center h-full">
+        <p class="text-gray-400">Seleccione un salón para ver sus mesas.</p>
+      </div>
+    </div>
+  </div>
+</div>

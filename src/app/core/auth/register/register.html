@@ -1,0 +1,78 @@
+<div class="h-screen w-screen bg-[url(../public/bgfinal.webp)] bg-cover bg-no-repeat bg-center flex items-center justify-center overflow-hidden">
+
+  <div class="p-4 sm:p-8">
+    <form class="max-w-sm mx-auto bg-gray-900/90 backdrop-blur-sm p-14 rounded-lg shadow-2xl" style="padding: 20px 50px 20px 50px;">
+      <h2 class="text-3xl font-bold mb-6 text-white text-center">Registrarse</h2>
+
+      <div class="mb-4">
+        <label for="username" class="block text-white mb-2">Usuario</label>
+        <input
+          [(ngModel)]="username"
+          placeholder="Tilin Insano"
+          type="text"
+          id="username"
+          name="username"
+          class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 "
+          required
+        />
+      </div>
+
+      <div class="mb-6">
+        <label for="password" class="block text-white mb-2">Contraseña</label>
+        <input
+          [(ngModel)]="password"
+          placeholder="Use #$&!@/()"
+          type="password"
+          id="password"
+          name="password"
+          class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 "
+          required
+        />
+      </div>
+
+      <div class="mb-6">
+        <label for="correo" class="block text-white mb-2">Correo</label>
+        <input
+          [(ngModel)]="correo"
+          placeholder="tilin@example.com"
+          type="email"
+          id="correo"
+          name="correo"
+          class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 "
+          required
+        />
+      </div>
+
+      <div class="mb-6">
+        <label for="telefono" class="block text-white mb-2">Telefono</label>
+        <input
+          [(ngModel)]="telefono"
+          placeholder="+51 999888777"
+          maxlength="9"
+          type="tel"
+          id="telefono"
+          name="telefono"
+          class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 "
+          required
+        />
+      </div>
+      <button
+        type="submit"
+        class="w-full bg-indigo-600 text-white p-2 rounded-md hover:bg-indigo-700 transition-colors"
+        (click)="registrarUsuario(username, password)"
+      >
+        Registrarse
+      </button>
+
+      <h2 class="text-1xl font-bold mb-6 text-white text-center pt-8 opacity-75">
+        ¿Ya tienes una cuenta?
+        <button
+          [routerLink]="['']"
+          class="text-indigo-500 hover:text-indigo-700 cursor-pointer opacity-75"
+        >
+          Inicia Sesión
+        </button>
+      </h2>
+    </form>
+  </div>
+</div>

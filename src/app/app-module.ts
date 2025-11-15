@@ -1,8 +1,13 @@
 import { NgModule, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { providePrimeNG } from 'primeng/config';
+import { ButtonModule } from 'primeng/button';
+import Aura from '@primeuix/themes/aura';
 
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
+import { CoreModule } from './core/core-module';
 
 @NgModule({
   declarations: [
@@ -10,10 +15,19 @@ import { App } from './app';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    ButtonModule,
+    CoreModule
   ],
+  
   providers: [
-    provideBrowserGlobalErrorListeners()
+    provideBrowserGlobalErrorListeners(),
+     provideAnimationsAsync(),
+        providePrimeNG({
+            theme: {
+                preset: Aura
+            }
+        })
   ],
   bootstrap: [App]
 })
