@@ -111,7 +111,7 @@
       </button>
       <button 
         pButton 
-        [label]="mode === 'create' ? 'Guardar cambios' : 'Actualizar cambios'"
+        [label]="mode === 'create' ? '' : ''"
         (click)="onSave()"
         [disabled]="loungeForm.invalid"
         class="bg-[#3c82f5] border-transparent text-white hover:bg-[#5a9aff] transition-colors"

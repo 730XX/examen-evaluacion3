@@ -22,7 +22,7 @@ export class AuthService {
           localStorage.setItem('user_name', response.data.user_name);
           localStorage.setItem('user_rol', response.data.user_rol);
           localStorage.setItem('user_id', response.data.user_id);
-          localStorage.setItem('store_id', response.data.user_uid); // Parece que user_uid es el store_id
+          localStorage.setItem('store_id', response.data.user_uid);
         }
       })
     );
