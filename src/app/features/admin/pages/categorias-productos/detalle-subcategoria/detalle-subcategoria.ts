@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CategoryFormData } from '../../../../../shared/category-modal/category-modal';
 import { ProductFormData, ProductInitialData } from '../../../../../shared/product-modal/product-modal';
+import { CategoryService } from '../../../../../core/services/category.service';
+import { ProductService } from '../../../../../core/services/product.service';
+
 /**
  * Define la estructura de la información de la Subcategoría
  * (basado en tu API, el primer JSON)
@@ -60,7 +63,9 @@ export class DetalleSubcategoria implements OnInit {
   private currentEditingProductId: string | null = null; // Para saber qué ID editar
 
   constructor(
-    private route: ActivatedRoute // Inyecta el servicio para leer la ruta activa
+    private route: ActivatedRoute,
+    private categoryService: CategoryService,
+    private productService: ProductService
   ) {}
 
   ngOnInit(): void {
@@ -74,15 +79,67 @@ export class DetalleSubcategoria implements OnInit {
       this.subcategoriaId = params['subId'];
       this.subcategoriaNombre = params['subNombre'];
       
-      this.cargarDatosDeEjemplo(this.subcategoriaId);
+      this.cargarDatos(this.subcategoriaId);
     });
   }
 
   /**
-   * Carga datos de ejemplo basados en el ID de la subcategoría.
+   * Carga la información de la subcategoría y sus productos desde la API
    */
+  private cargarDatos(idSubcategoria: string | null): void {
+    if (!idSubcategoria) return;
+    
+    // Cargar información de la subcategoría
+    this.cargarInfoSubcategoria(idSubcategoria);
+    
+    // Cargar productos de esta subcategoría
+    this.cargarProductos(idSubcategoria);
+  }
 
-  private cargarDatosDeEjemplo(idSubcategoria: string | null): void {
+  /**
+   * Obtiene la información detallada de la subcategoría por ID (GET)
+   */
+  private cargarInfoSubcategoria(idSubcategoria: string): void {
+    this.categoryService.getCategoryById(Number(idSubcategoria)).subscribe({
+      next: (response) => {
+        console.log('Response info subcategoría:', response);
+        
+        if (response && response.data) {
+          // La API devuelve {tipo, data: {...}, mensajes}
+          this.subcategoriaInfo = response.data;
+          console.log('Información de subcategoría cargada:', this.subcategoriaInfo);
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar información de subcategoría:', err);
+      }
+    });
+  }
+
+  /**
+   * Carga los productos que pertenecen a esta subcategoría
+   */
+  private cargarProductos(idSubcategoria: string): void {
+    // Llamamos al endpoint de productos con category_id = idSubcategoria
+    this.productService.getProducts(undefined, undefined, idSubcategoria).subscribe({
+      next: (response) => {
+        console.log('Response productos de subcategoría:', response);
+        
+        if (response && response.data) {
+          // Filtramos productos que tengan category_id igual a la subcategoría
+          this.productos = response.data.filter(
+            (prod: Producto) => prod.category_id === idSubcategoria
+          );
+          console.log('Productos de subcategoría cargados:', this.productos);
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar productos de subcategoría:', err);
+      }
+    });
+  }
+
+  private cargarDatosDeEjemplo_OLD(idSubcategoria: string | null): void {
     // Solo cargamos datos si el ID es "4" (Bebidas Frias), como en tu ejemplo
     if (idSubcategoria === '4') {
       // Carga la información de la Subcategoría
@@ -167,12 +224,29 @@ export class DetalleSubcategoria implements OnInit {
 
   public onModalSave(formData: CategoryFormData): void {
     if (this.modalMode === 'edit') {
-      console.log('--- EDITANDO SUBCATEGORÍA ---');
-      console.log('ID a editar:', this.dataToEdit?.id); 
-      console.log('Nuevo Nombre:', formData.name);
-      // ... servicio PUT ...
-      this.subcategoriaNombre = formData.name;
+      this.editarSubcategoria(formData);
     }
+  }
+
+  /**
+   * Edita la subcategoría actual
+   */
+  private editarSubcategoria(formData: CategoryFormData): void {
+    // TODO: Implementar actualización con API
+    console.log('--- EDITANDO SUBCATEGORÍA ---');
+    console.log('ID a editar:', this.dataToEdit?.id);
+    console.log('Nuevo Nombre:', formData.name);
+    
+    // Actualización local inmediata
+    this.subcategoriaNombre = formData.name;
+    
+    // Cuando implementes el PUT:
+    // const data = {
+    //   category_id: this.dataToEdit?.id,
+    //   category_name: formData.name,
+    //   category_urlimage: formData.imageUrl || '',
+    // };
+    // this.categoryService.updateCategory(data).subscribe(...);
   }
 
   // --- Métodos que controlan el Modal de PRODUCTO ---
@@ -208,17 +282,46 @@ export class DetalleSubcategoria implements OnInit {
    */
   public onProductModalSave(formData: ProductFormData): void {
     if (this.productModalMode === 'create') {
-      console.log('--- CREANDO PRODUCTO (en Subcategoría) ---');
-      console.log('Datos:', formData);
-      console.log('Para Subcategoría ID:', this.subcategoriaId); // Importante
-      // ... servicio POST para crear producto ...
-
+      this.crearProducto(formData);
     } else {
-      console.log('--- EDITANDO PRODUCTO ---');
-      console.log('ID a editar:', this.currentEditingProductId);
-      console.log('Nuevos Datos:', formData);
-      // ... servicio PUT para actualizar producto ...
+      this.editarProducto(formData);
     }
+  }
+
+  /**
+   * Crea un nuevo producto en esta subcategoría
+   */
+  private crearProducto(formData: ProductFormData): void {
+    const data = {
+      product_name: formData.name,
+      product_price: formData.price,
+      product_stock: formData.stock,
+      product_needpreparation: formData.needsPreparation ? '1' : '0',
+      category_id: this.subcategoriaId, // Producto pertenece a la subcategoría
+      product_urlimage: formData.image || '',
+      product_state: '1'
+    };
+
+    this.productService.createProduct(data).subscribe({
+      next: (response) => {
+        console.log('Producto creado exitosamente en subcategoría:', response);
+        // Recargar productos
+        this.cargarProductos(this.subcategoriaId!);
+      },
+      error: (err) => {
+        console.error('Error al crear producto:', err);
+      }
+    });
+  }
+
+  /**
+   * Edita un producto existente
+   */
+  private editarProducto(formData: ProductFormData): void {
+    // TODO: Implementar actualización
+    console.log('--- EDITANDO PRODUCTO ---');
+    console.log('ID a editar:', this.currentEditingProductId);
+    console.log('Nuevos Datos:', formData);
   }
 
   // (Aquí irían los métodos para el modal de Productos: showCreateProductDialog, showEditProductDialog, etc.)
