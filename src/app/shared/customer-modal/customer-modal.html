@@ -89,7 +89,7 @@
         />
       </div>
       
-       <!-- Fila Completa: Dirección (Opcional, de tu JSON) -->
+       <!-- Fila Completa: Dirección (Opcional) -->
       <div class="flex flex-col gap-2 md:col-span-2">
         <label for="customerAddress" class="font-semibold text-gray-300">Dirección (Opcional)</label>
         <input 
@@ -98,6 +98,43 @@
           formControlName="address"
           placeholder="Ejm: Av. Siempre Viva 123"
           class="w-full bg-[#111317] border border-gray-700 rounded-lg text-white p-3 placeholder-gray-500 focus:outline-none focus:border-[#3c82f5] transition-colors"
+        />
+      </div>
+
+      <!-- Columna 1: País (Opcional) -->
+      <div class="flex flex-col gap-2">
+        <label for="customerCountry" class="font-semibold text-gray-300">País (Opcional)</label>
+        <input 
+          pInputText 
+          id="customerCountry" 
+          formControlName="country"
+          placeholder="Ejm: Perú"
+          class="w-full bg-[#111317] border border-gray-700 rounded-lg text-white p-3 placeholder-gray-500 focus:outline-none focus:border-[#3c82f5] transition-colors"
+        />
+      </div>
+
+      <!-- Columna 2: Fecha de Nacimiento (Opcional) -->
+      <div class="flex flex-col gap-2">
+        <label for="customerBirthdate" class="font-semibold text-gray-300">Fecha de Nacimiento (Opcional)</label>
+        <input 
+          type="date"
+          pInputText 
+          id="customerBirthdate" 
+          formControlName="birthdate"
+          class="w-full bg-[#111317] border border-gray-700 rounded-lg text-white p-3 placeholder-gray-500 focus:outline-none focus:border-[#3c82f5] transition-colors"
+        />
+      </div>
+
+      <!-- Estado (Solo visible en modo edición) -->
+      <div *ngIf="mode === 'edit'" class="flex flex-col gap-2 md:col-span-2">
+        <label for="customerState" class="font-semibold text-gray-300">Estado</label>
+        <p-select 
+          id="customerState"
+          [options]="[{label: 'Activo', value: '1'}, {label: 'Inactivo', value: '0'}]" 
+          formControlName="state"
+          styleClass="w-full"
+          panelStyleClass="bg-[#1f242f] border border-gray-700 text-white"
+          class="w-full bg-[#111317] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#3c82f5] transition-colors"
         />
       </div>
 

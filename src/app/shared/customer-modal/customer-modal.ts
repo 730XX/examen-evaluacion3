@@ -9,7 +9,10 @@ export interface CustomerFormData {
   phone: string;
   typeDocument: string;
   numberDocument: string;
-  address: string; // Aunque no está en la imagen, lo incluyo por tu JSON
+  address: string;
+  country: string;
+  birthdate?: string;
+  state: string;
 }
 
 /** Datos que el modal recibe en modo 'edit' */
@@ -20,6 +23,9 @@ export interface CustomerInitialData {
   typeDocument: string;
   numberDocument: string;
   address: string;
+  country: string;
+  birthdate?: string;
+  state: string;
 }
 
 @Component({
@@ -64,7 +70,10 @@ export class CustomerModal implements OnChanges {
       phone: ['', Validators.required],
       typeDocument: ['1', Validators.required], // Default 'DNI'
       numberDocument: ['', Validators.required],
-      address: [''] // Campo opcional
+      address: [''],
+      country: [''],
+      birthdate: [''],
+      state: ['1'] // Default 'Activo'
     });
   }
 
@@ -88,7 +97,10 @@ export class CustomerModal implements OnChanges {
         phone: '',
         typeDocument: '1',
         numberDocument: '',
-        address: ''
+        address: '',
+        country: '',
+        birthdate: '',
+        state: '1'
       });
     }
   }

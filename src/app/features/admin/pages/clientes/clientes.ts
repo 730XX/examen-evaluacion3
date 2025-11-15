@@ -99,31 +99,90 @@ export class Clientes implements OnInit {
   public showEditClienteDialog(cliente: Customer): void {
     this.modalMode = 'edit';
     this.currentEditingCustomerId = cliente.customer_id;
-    // Aquí mapeas los datos del cliente al formato que tu modal de cliente espere
+    // Mapear los datos del cliente al formato que el modal espera
     this.dataToEdit = {
       name: cliente.customer_name,
       email: cliente.customer_email,
       phone: cliente.customer_phone,
       address: cliente.customer_address,
+      country: cliente.customer_country || '',
       typeDocument: cliente.customer_typedocument,
       numberDocument: cliente.customer_numberdocument,
-      // ... etc.
+      birthdate: cliente.customer_birthdate || '',
+      state: cliente.customer_state
     };
     this.modalVisible = true;
     console.log('Abriendo modal para editar cliente:', cliente.customer_id);
   }
 
   public onModalSave(formData: any): void {
-    // (formData será la interfaz de tu modal de cliente)
     if (this.modalMode === 'create') {
-      console.log('--- CREANDO CLIENTE ---');
-      console.log('Datos:', formData);
-      // ... servicio POST ...
+      this.crearCliente(formData);
     } else {
-      console.log('--- EDITANDO CLIENTE ---');
-      console.log('ID a editar:', this.currentEditingCustomerId);
-      console.log('Nuevos Datos:', formData);
-      // ... servicio PUT ...
+      this.editarCliente(formData);
     }
+  }
+
+  /**
+   * Crear un nuevo cliente
+   */
+  private crearCliente(formData: any): void {
+    console.log('Creando cliente:', formData);
+    
+    const customerData = {
+      customer_name: formData.name,
+      customer_email: formData.email,
+      customer_phone: formData.phone,
+      customer_address: formData.address,
+      customer_country: formData.country,
+      customer_typedocument: formData.typeDocument,
+      customer_numberdocument: formData.numberDocument,
+      customer_birthdate: formData.birthdate || null,
+      customer_state: '1' // Siempre activo al crear
+    };
+
+    this.customersService.createCustomer(customerData).subscribe({
+      next: (response) => {
+        console.log('Cliente creado exitosamente:', response);
+        // Recargar la lista de clientes
+        this.cargarClientes();
+        this.modalVisible = false;
+      },
+      error: (err) => {
+        console.error('Error al crear cliente:', err);
+      }
+    });
+  }
+
+  /**
+   * Editar un cliente existente
+   */
+  private editarCliente(formData: any): void {
+    console.log('Editando cliente ID:', this.currentEditingCustomerId);
+    
+    const customerData = {
+      customer_id: this.currentEditingCustomerId,
+      customer_name: formData.name,
+      customer_email: formData.email,
+      customer_phone: formData.phone,
+      customer_address: formData.address,
+      customer_country: formData.country,
+      customer_typedocument: formData.typeDocument,
+      customer_numberdocument: formData.numberDocument,
+      customer_birthdate: formData.birthdate || null,
+      customer_state: formData.state
+    };
+
+    this.customersService.updateCustomer(customerData).subscribe({
+      next: (response) => {
+        console.log('Cliente actualizado exitosamente:', response);
+        // Recargar la lista de clientes
+        this.cargarClientes();
+        this.modalVisible = false;
+      },
+      error: (err) => {
+        console.error('Error al actualizar cliente:', err);
+      }
+    });
   }
 }
