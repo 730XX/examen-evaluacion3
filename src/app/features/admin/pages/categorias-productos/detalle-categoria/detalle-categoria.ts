@@ -391,9 +391,10 @@ export class DetalleCategoria implements OnInit {
       product_name: formData.name,
       product_price: formData.price,
       product_stock: formData.stock,
+      product_description: '',
       product_needpreparation: formData.needsPreparation ? '1' : '0',
       category_id: this.categoriaId, // Producto pertenece a la categoría padre
-      product_urlimage: formData.image || '',
+      product_urlimage: formData.imageUrl || '',
       product_state: '1'
     };
 
@@ -413,9 +414,29 @@ export class DetalleCategoria implements OnInit {
    * Edita un producto existente
    */
   private editarProducto(formData: ProductFormData): void {
-    // TODO: Implementar actualización
-    console.log('--- EDITANDO PRODUCTO ---');
-    console.log('ID a editar:', this.currentEditingProductId);
-    console.log('Nuevos Datos:', formData);
+    if (!this.currentEditingProductId) return;
+
+    const data = {
+      product_id: this.currentEditingProductId,
+      product_name: formData.name,
+      product_price: formData.price,
+      product_stock: formData.stock,
+      product_description: '',
+      product_needpreparation: formData.needsPreparation ? '1' : '0',
+      category_id: this.categoriaId, // Producto pertenece a la categoría padre
+      product_urlimage: formData.imageUrl || '',
+      product_state: '1'
+    };
+
+    this.productService.updateProduct(data).subscribe({
+      next: (response) => {
+        console.log('Producto actualizado exitosamente:', response);
+        // Recargar productos
+        this.cargarProductosGenerales(this.categoriaId!);
+      },
+      error: (err) => {
+        console.error('Error al actualizar producto:', err);
+      }
+    });
   }
 }

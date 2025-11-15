@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CustomersService } from '../../../../core/services/customers.service';
+import { MessageService } from 'primeng/api';
 
 /**
  * Define la estructura de un Cliente (basado en tu API)
@@ -35,11 +36,16 @@ export class Clientes implements OnInit {
   public dataToEdit: any | null = null;
   private currentEditingCustomerId: string | null = null;
 
-  constructor(private customersService: CustomersService) {}
+  constructor(
+    private customersService: CustomersService,
+    private messageService: MessageService
+  ) {}
 
   ngOnInit(): void {
     this.cargarClientes();
   }
+
+  
 
   /**
    * Carga los clientes desde la API
@@ -144,12 +150,29 @@ export class Clientes implements OnInit {
     this.customersService.createCustomer(customerData).subscribe({
       next: (response) => {
         console.log('Cliente creado exitosamente:', response);
+        
+        // Mostrar toast de éxito
+        this.messageService.add({
+          severity: 'success',
+          summary: '¡Éxito!',
+          detail: 'Cliente creado correctamente',
+          life: 3000
+        });
+        
         // Recargar la lista de clientes
         this.cargarClientes();
         this.modalVisible = false;
       },
       error: (err) => {
         console.error('Error al crear cliente:', err);
+        
+        // Mostrar toast de error
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo crear el cliente. Intenta nuevamente.',
+          life: 4000
+        });
       }
     });
   }
@@ -176,12 +199,29 @@ export class Clientes implements OnInit {
     this.customersService.updateCustomer(customerData).subscribe({
       next: (response) => {
         console.log('Cliente actualizado exitosamente:', response);
+        
+        // Mostrar toast de éxito
+        this.messageService.add({
+          severity: 'success',
+          summary: '¡Actualizado!',
+          detail: 'Cliente modificado correctamente',
+          life: 3000
+        });
+        
         // Recargar la lista de clientes
         this.cargarClientes();
         this.modalVisible = false;
       },
       error: (err) => {
         console.error('Error al actualizar cliente:', err);
+        
+        // Mostrar toast de error
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo actualizar el cliente. Intenta nuevamente.',
+          life: 4000
+        });
       }
     });
   }

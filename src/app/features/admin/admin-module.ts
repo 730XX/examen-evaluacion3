@@ -9,8 +9,11 @@ import { SharedModule } from "../../shared/shared-module";
 import { ListadoCategorias } from './pages/categorias-productos/listado-categorias/listado-categorias';
 import { DetalleCategoria } from './pages/categorias-productos/detalle-categoria/detalle-categoria';
 import { DetalleSubcategoria } from './pages/categorias-productos/detalle-subcategoria/detalle-subcategoria';
-import { ButtonModule } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { ButtonModule } from 'primeng/button';
+
 
 
 
@@ -29,7 +32,11 @@ import { Dialog } from 'primeng/dialog';
     AdminRoutingModule,
     SharedModule,
     ButtonModule,
-    Dialog
-]
+    Dialog,
+    ToastModule,
+],
+  providers: [
+    MessageService
+  ],
 })
 export class AdminModule { }

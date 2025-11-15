@@ -10,6 +10,7 @@ export interface ProductFormData {
   stock: number;
   needsPreparation: boolean;
   image?: File | null;
+  imageUrl?: string;
 }
 
 /** Datos que el modal recibe en modo 'edit' */
@@ -68,7 +69,6 @@ export class ProductModal implements OnChanges {
    */
   private setupModal(): void {
     this.selectedFile = null;
-    this.imagePreviewUrl = null;
 
     if (this.mode === 'edit' && this.initialData) {
       this.headerTitle = 'Editar Producto';
@@ -77,6 +77,7 @@ export class ProductModal implements OnChanges {
       this.imagePreviewUrl = this.initialData.imageUrl;
     } else {
       this.headerTitle = 'Crear Producto';
+      this.imagePreviewUrl = null;
       // Reseteamos el formulario a sus valores por defecto
       this.productForm.reset({
         name: '',
@@ -111,10 +112,26 @@ export class ProductModal implements OnChanges {
       return; // No guardar si el formulario es inválido
     }
 
+    // Determinar la URL de la imagen a enviar
+    let imageUrlToSend = '';
+    
+    // Si estamos editando y hay imagen inicial, mantenerla
+    if (this.mode === 'edit' && this.initialData && this.initialData.imageUrl) {
+      imageUrlToSend = this.initialData.imageUrl;
+    }
+    
+    // Si se seleccionó un nuevo archivo, aquí debería ir la lógica de subida
+    // Por ahora, si hay un nuevo archivo, dejamos vacío hasta implementar subida
+    if (this.selectedFile) {
+      // TODO: Implementar subida de imagen y obtener URL real
+      imageUrlToSend = ''; // Por ahora vacío
+    }
+
     // Recogemos los datos del formulario
     const formData: ProductFormData = {
       ...this.productForm.value, // Esto incluye name, price, stock, needsPreparation
-      image: this.selectedFile
+      image: this.selectedFile,
+      imageUrl: imageUrlToSend
     };
     
     this.save.emit(formData);

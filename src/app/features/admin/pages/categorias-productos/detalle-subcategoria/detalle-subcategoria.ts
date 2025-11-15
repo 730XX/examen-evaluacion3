@@ -25,6 +25,7 @@ interface Producto {
   product_id: string;
   product_name: string;
   product_price: string;
+  product_description?: string
   product_stock: string;
   product_urlimage: string;
   product_state: string;
@@ -270,6 +271,7 @@ export class DetalleSubcategoria implements OnInit {
     this.productDataToEdit = {
       name: producto.product_name,
       price: parseFloat(producto.product_price),
+     
       stock: parseFloat(producto.product_stock),
       needsPreparation: producto.product_needpreparation === '1',
       imageUrl: producto.product_urlimage
@@ -296,9 +298,10 @@ export class DetalleSubcategoria implements OnInit {
       product_name: formData.name,
       product_price: formData.price,
       product_stock: formData.stock,
+      product_description: '',
       product_needpreparation: formData.needsPreparation ? '1' : '0',
       category_id: this.subcategoriaId, // Producto pertenece a la subcategoría
-      product_urlimage: formData.image || '',
+      product_urlimage: formData.imageUrl || '',
       product_state: '1'
     };
 
@@ -318,10 +321,30 @@ export class DetalleSubcategoria implements OnInit {
    * Edita un producto existente
    */
   private editarProducto(formData: ProductFormData): void {
-    // TODO: Implementar actualización
-    console.log('--- EDITANDO PRODUCTO ---');
-    console.log('ID a editar:', this.currentEditingProductId);
-    console.log('Nuevos Datos:', formData);
+    if (!this.currentEditingProductId) return;
+
+    const data = {
+      product_id: this.currentEditingProductId,
+      product_name: formData.name,
+      product_price: formData.price,
+      product_stock: formData.stock,
+      product_description: '',
+      product_needpreparation: formData.needsPreparation ? '1' : '0',
+      category_id: this.subcategoriaId, // Producto pertenece a la subcategoría
+      product_urlimage: formData.imageUrl || '',
+      product_state: '1'
+    };
+
+    this.productService.updateProduct(data).subscribe({
+      next: (response) => {
+        console.log('Producto actualizado exitosamente:', response);
+        // Recargar productos
+        this.cargarProductos(this.subcategoriaId!);
+      },
+      error: (err) => {
+        console.error('Error al actualizar producto:', err);
+      }
+    });
   }
 
   // (Aquí irían los métodos para el modal de Productos: showCreateProductDialog, showEditProductDialog, etc.)
