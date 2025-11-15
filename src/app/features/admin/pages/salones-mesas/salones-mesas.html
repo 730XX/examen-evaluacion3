@@ -3,7 +3,7 @@
   <!-- HEADER -->
   <div class="flex items-center p-4 border-b border-gray-700 flex-none">
     <span class="text-2xl font-bold font-montserrat flex items-center gap-2">
-      <span class="material-icons">table_restaurant</span>
+      <span class="material-icons"></span>
       Salones y Mesas
     </span>
   </div>
@@ -14,6 +14,21 @@
     <!-- LISTA DE SALONES -->
     <div class="w-96 flex flex-col gap-4 pr-4 border-r border-gray-700 flex-none overflow-y-auto">
       <h2 class="text-xl font-bold pb-4 border-b border-gray-700">Listado de Salones</h2>
+      <div class="flex gap-4">
+        <!-- Buscador -->
+        <input
+          type="text"
+          placeholder="Buscar salón..."
+          class="w-full md:w-72 px-4 py-2 bg-[#1f242f] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#3c82f5] transition-colors"
+        />
+        <!-- Botón Crear Salón -->
+        <button
+          (click)="showCreateLoungeDialog()"
+          class="flex-none px-4 py-2 bg-[#3c82f5] text-white text-sm font-medium rounded-lg hover:bg-[#5a9aff] transition-colors"
+        >
+          Crear Salón
+        </button>
+      </div>
 
       <div *ngIf="loadingSalones" class="text-gray-400 text-sm animate-pulse">
         Cargando salones...
@@ -23,13 +38,26 @@
         No existen salones registrados.
       </div>
 
+      <!-- Card del Salón -->
       <div
         *ngFor="let salon of salones"
         (click)="seleccionarSalon(salon)"
         [ngClass]="salonSeleccionado?.lounge_id === salon.lounge_id ? 'border-[#3c82f5]' : 'border-transparent'"
         class="p-4 bg-[#1f242f] rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer border-2"
       >
-        <h3 class="text-lg font-semibold mb-2">{{ salon.lounge_name }}</h3>
+        <div class="flex justify-between items-center">
+          <h3 class="text-lg font-semibold mb-2">{{ salon.lounge_name }}</h3>
+          <!-- 
+            Botón de Editar
+            (He añadido este botón para que puedas usar la lógica de edición)
+          -->
+          <button 
+            (click)="showEditLoungeDialog($event, salon)"
+            class="text-sm text-gray-400 hover:text-[#3c82f5] transition-colors"
+          >
+            Editar
+          </button>
+        </div>
         <p class="text-sm text-gray-300">Mesas: {{ salon.cantidad_mesas }}</p>
       </div>
     </div>
@@ -61,14 +89,15 @@
                   [ngClass]="mesaSeleccionada?.tablee_id === mesa.tablee_id ? 'bg-[#2a3f5f]' : ''">
 
                 <td class="px-6 py-4 text-sm font-medium text-white">{{ mesa.tablee_name}}</td>
-                <td class="px-6 py-4 text-sm text-gray-300">{{ mesa.tablee_state }}</td>
-                <td class="px-6 py-4 text-sm text-gray-300">{{ mesa.tablee_mozoid }}</td>
+                <!-- <td class="px-6 py-4 text-sm text-gray-300">{{ mesa.tablee_state | tableState }}</td> -->
+                <td class="px-6 py-4 text-sm text-gray-300">{{ mesa.tablee_mozo || 'Sin asignar' }}</td>
 
                 <td class="px-6 py-4 text-sm text-gray-300">
                   <button class="text-[#3c82f5] hover:text-[#5a9aff] mr-3 transition-colors"
                           (click)="$event.stopPropagation(); verMesa(mesa)">
                     Ver detalles
                   </button>
+                  <!-- (Aquí podrías añadir un botón para editar mesa) -->
                 </td>
               </tr>
             </tbody>
@@ -88,3 +117,19 @@
     </div>
   </div>
 </div>
+
+<!-- 
+  AQUÍ ESTÁ EL MODAL DE SALÓN
+  Conectado a las variables del TS
+-->s
+<app-lounge-modal
+  [(visible)]="modalVisible"
+  [mode]="modalMode"
+  [initialData]="dataToEdit"
+  (save)="onLoungeModalSave($event)"
+></app-lounge-modal>
+
+<!-- 
+  (Aquí podrías tener un futuro app-table-modal
+   para crear/editar mesas)
+-->

@@ -1,1 +1,113 @@
-<p>lounge-modal works!</p>
+<p-dialog
+  [(visible)]="visible"
+  (onHide)="closeModal()"
+  [modal]="true"
+  [style]="{ width: '40rem' }"
+  [breakpoints]="{ '1199px': '60vw', '575px': '90vw' }"
+  [draggable]="false"
+  [maximizable]="true"
+  contentStyleClass="bg-[#1f242f] text-white p-6"
+>
+  <!-- 
+    Header Personalizado
+  -->
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-2 bg-[#1f242f] text-white">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#3c82f5]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span class="text-xl font-bold">{{ headerTitle }}</span>
+    </div>
+  </ng-template>
+
+  <!-- 
+    Contenido del Formulario
+  -->
+  <form [formGroup]="loungeForm" (ngSubmit)="onSave()">
+    <div class="flex flex-col gap-6">
+      
+      <!-- 1. Nombre del Salón -->
+      <div class="flex flex-col gap-2">
+        <label for="loungeName" class="font-semibold text-gray-300">Nombre del salón</label>
+        <input 
+          pInputText 
+          id="loungeName" 
+          formControlName="name"
+          placeholder="Ejm: Terraza"
+          class="w-full bg-[#111317] border border-gray-700 rounded-lg text-white p-3 placeholder-gray-500 focus:outline-none focus:border-[#3c82f5] transition-colors"
+        />
+      </div>
+
+      <!-- 2. Cantidad de Mesas -->
+      <div class="flex flex-col items-center gap-3">
+        <label class="font-semibold text-gray-300 flex items-center gap-2">
+          <!-- Icono de Silla (SVG) -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 019 18v-5H5a1 1 0 01-.82-1.573l7-10a1 1 0 01.12-.38zM10 5.174L6.932 10H10v4.826L13.068 10H10V5.174z" clip-rule="evenodd" />
+            <path d="M4 10a1 1 0 011-1h2.068L10 5.174V2a1 1 0 00-1.12-.99l-7 10A1 1 0 002.82 13H5v3a1 1 0 001 1h1a1 1 0 001-1v-3h.068L10 14.826V18a1 1 0 001.12.99l7-10A1 1 0 0017.18 7H15V4a1 1 0 00-1-1h-1a1 1 0 00-1 1v3h-.068L10 5.174V2a1 1 0 00-1.12-.99z" />
+             <!-- Icono de silla/mesa simple -->
+            <path d="M4 3a1 1 0 011-1h10a1 1 0 011 1v1h-3a1 1 0 00-1 1v2h-4V5a1 1 0 00-1-1H4V3zM3 8v9a1 1 0 001 1h12a1 1 0 001-1V8H3zm3 3a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1z" />
+          </svg>
+          Cantidad de mesas
+        </label>
+        
+        <!-- Contador personalizado -->
+        <div class="flex items-center justify-center gap-4">
+          <button 
+            type="button" 
+            (click)="decrementTables()"
+            class="w-10 h-10 flex items-center justify-center bg-[#3c82f5] text-white rounded-full text-2xl font-bold hover:bg-[#5a9aff] transition-colors"
+          >
+            -
+          </button>
+          
+          <input 
+            type="number"
+            formControlName="tableCount"
+            class="w-24 text-center text-3xl font-bold bg-transparent border-none text-white focus:ring-0"
+          >
+          
+          <button 
+            type="button" 
+            (click)="incrementTables()"
+            class="w-10 h-10 flex items-center justify-center bg-[#3c82f5] text-white rounded-full text-2xl font-bold hover:bg-[#5a9aff] transition-colors"
+          >
+            +
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </form>
+
+  <!-- 
+    Footer
+  -->
+  <ng-template pTemplate="footer">
+    <div classT="w-full flex justify-end gap-3 bg-[#1f242f] pt-4">
+      <button 
+        pButton 
+        label="Cancelar"
+        (click)="closeModal()"
+        class="p-button-text text-gray-300 hover:bg-gray-700"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+        </svg>
+        Cancelar
+      </button>
+      <button 
+        pButton 
+        [label]="mode === 'create' ? 'Guardar cambios' : 'Actualizar cambios'"
+        (click)="onSave()"
+        [disabled]="loungeForm.invalid"
+        class="bg-[#3c82f5] border-transparent text-white hover:bg-[#5a9aff] transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z" />
+        </svg>
+        {{ mode === 'create' ? 'Guardar cambios' : 'Actualizar cambios' }}
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>

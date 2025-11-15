@@ -43,7 +43,8 @@ import { LoungeModal } from './lounge-modal/lounge-modal';
     CategoryCard,
     CategoryModal,
     ProductModal,
-    CustomerModal
+    CustomerModal,
+    LoungeModal
   ]
 })
 export class SharedModule { }
