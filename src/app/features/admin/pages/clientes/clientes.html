@@ -37,8 +37,19 @@
     - Añadido 'flex-1 p-4 overflow-y-auto' para que la tabla ocupe el espacio y tenga scroll
   -->
   <div class="flex-1 p-4 overflow-y-auto">
+    
+    <!-- Indicador de carga -->
+    <div *ngIf="loadingClientes" class="text-gray-400 text-sm animate-pulse mb-4">
+      Cargando clientes...
+    </div>
+
+    <!-- Mensaje si no hay clientes --> 
+    <div *ngIf="!loadingClientes && clientes.length === 0" class="text-gray-500 text-sm mb-4">
+      No hay clientes registrados.
+    </div>
+
     <!-- Contenedor de la Tabla -->
-    <div class="bg-[#1f242f] rounded-lg shadow-md overflow-hidden">
+    <div *ngIf="!loadingClientes && clientes.length > 0" class="bg-[#1f242f] rounded-lg shadow-md overflow-hidden">
       <table class="w-full">
         <thead class="bg-[#151a23]">
           <tr>
@@ -117,15 +128,6 @@
               <button class="text-red-500 hover:text-red-400 transition-colors">Eliminar</button>
             </td>
           </tr>
-
-          <!-- Mensaje si no hay clientes -->
-          @if (clientes.length === 0) {
-            <tr>
-              <td colspan="5" class="p-8 text-center text-gray-500">
-                No se encontraron clientes.
-              </td>
-            </tr>
-          }
 
         </tbody>
       </table>

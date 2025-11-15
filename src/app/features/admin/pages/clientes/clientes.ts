@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-
-// (Importar aquí la futura interfaz del modal de cliente)
-// import { CustomerFormData } from '../../shared/components/customer-modal/customer-modal.component';
+import { CustomersService } from '../../../../core/services/customers.service';
 
 /**
  * Define la estructura de un Cliente (basado en tu API)
@@ -13,98 +11,61 @@ interface Customer {
   customer_phone: string;
   customer_address: string;
   customer_country: string | null;
-  customer_typedocument: string; // "1" = DNI, "2" = RUC, etc. (Asumo)
+  customer_typedocument: string; // "1" = DNI, "2" = RUC, etc.
   customer_numberdocument: string;
   customer_birthdate: string | null;
   customer_registrationdate: string | null;
-  customer_state: string; // "1" = Activo, "0" = Inactivo (Asumo)
+  customer_state: string; // "1" = Activo, "0" = Inactivo
   user_id: string | null;
 }
 
 @Component({
-  selector: 'app-clientes', // Tu selector
+  selector: 'app-clientes',
   standalone: false,
   templateUrl: './clientes.html',
   styleUrls: ['./clientes.scss'],
 })
 export class Clientes implements OnInit {
   public clientes: Customer[] = [];
+  public loadingClientes: boolean = false;
 
   // --- Propiedades para controlar el Modal de Clientes ---
   public modalVisible: boolean = false;
   public modalMode: 'create' | 'edit' = 'create';
-  // (Usaremos 'any' por ahora, luego crearás la interfaz 'CustomerInitialData')
   public dataToEdit: any | null = null;
   private currentEditingCustomerId: string | null = null;
 
-  constructor() {}
+  constructor(private customersService: CustomersService) {}
 
   ngOnInit(): void {
-    this.cargarDatosDeEjemplo();
+    this.cargarClientes();
   }
 
   /**
-   * Carga los datos de ejemplo de clientes.
+   * Carga los clientes desde la API
    */
-  private cargarDatosDeEjemplo(): void {
-    this.clientes = [
-      {
-        customer_id: '1',
-        customer_name: 'Cesar Chero',
-        customer_email: 'cesarcherrro@gmail.com',
-        customer_phone: '912740843',
-        customer_address: 'enace',
-        customer_country: null,
-        customer_typedocument: '1',
-        customer_numberdocument: '78580946',
-        customer_birthdate: null,
-        customer_registrationdate: null,
-        customer_state: '1', // <-- Cambiado a 1 para que se vea activo
-        user_id: null,
+  private cargarClientes(): void {
+    this.loadingClientes = true;
+    
+    // Llamar al servicio con los parámetros por defecto
+    // page: '-1' = todos, perPage: '-1' = todos, customer_name: '-1' = todos
+    // customer_typedocument: '-1' = todos, customer_state: '1' = solo activos
+    this.customersService.getCustomers('-1', '-1', '-1', '-1', '-1').subscribe({
+      next: (response) => {
+        console.log('Respuesta de getCustomers:', response);
+        if (response && response.data) {
+          this.clientes = response.data;
+        } else {
+          this.clientes = [];
+        }
+        this.loadingClientes = false;
       },
-      {
-        customer_id: '2',
-        customer_name: 'Kevin Cezpedez',
-        customer_email: 'kevinflow@gmail.com',
-        customer_phone: '988123567',
-        customer_address: 'tos',
-        customer_country: null,
-        customer_typedocument: '2',
-        customer_numberdocument: '12345678',
-        customer_birthdate: null,
-        customer_registrationdate: null,
-        customer_state: '1', // <-- Cambiado a 1
-        user_id: null,
-      },
-      {
-        customer_id: '3',
-        customer_name: 'Ana García',
-        customer_email: 'anagarcia@email.com',
-        customer_phone: '987654321',
-        customer_address: '',
-        customer_country: '',
-        customer_typedocument: '1',
-        customer_numberdocument: '12345678',
-        customer_birthdate: '0000-00-00',
-        customer_registrationdate: '0000-00-00 00:00:00',
-        customer_state: '0',
-        user_id: null,
-      },
-      {
-        customer_id: '4',
-        customer_name: 'Luis Rodríguez',
-        customer_email: 'luis.r@email.com',
-        customer_phone: '912345678',
-        customer_address: '',
-        customer_country: '',
-        customer_typedocument: '1',
-        customer_numberdocument: '23456789',
-        customer_birthdate: null,
-        customer_registrationdate: null,
-        customer_state: '1',
-        user_id: null,
-      },
-    ];
+      error: (err) => {
+        console.error('Error al cargar clientes:', err);
+        this.loadingClientes = false;
+        this.clientes = [];
+      }
+    });
   }
 
   // --- Métodos de Ayuda para la Vista ---
