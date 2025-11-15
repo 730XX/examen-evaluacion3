@@ -4,6 +4,7 @@ import { CategoryFormData } from '../../../../../shared/category-modal/category-
 import { ProductFormData, ProductInitialData } from '../../../../../shared/product-modal/product-modal';
 import { CategoryService } from '../../../../../core/services/category.service';
 import { ProductService } from '../../../../../core/services/product.service';
+import { MessageService } from 'primeng/api';
 
 /**
  * Define la estructura de la información de la Subcategoría
@@ -66,7 +67,8 @@ export class DetalleSubcategoria implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private categoryService: CategoryService,
-    private productService: ProductService
+    private productService: ProductService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
@@ -233,15 +235,30 @@ export class DetalleSubcategoria implements OnInit {
    * Edita la subcategoría actual
    */
   private editarSubcategoria(formData: CategoryFormData): void {
-    // TODO: Implementar actualización con API
-    console.log('--- EDITANDO SUBCATEGORÍA ---');
-    console.log('ID a editar:', this.dataToEdit?.id);
-    console.log('Nuevo Nombre:', formData.name);
-    
+    if (!this.subcategoriaInfo) return;
+
+    // Detectar si hubo cambios
+    const sinCambios =
+      this.subcategoriaInfo.category_name === formData.name &&
+      this.subcategoriaInfo.category_urlimage === (formData.imageUrl || '');
+
+    if (sinCambios) {
+      // No mostrar toast, cerrar modal silenciosamente
+      this.modalVisible = false;
+      return;
+    }
+
     // Actualización local inmediata
     this.subcategoriaNombre = formData.name;
     
-    // Cuando implementes el PUT:
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Subcategoría actualizada',
+      detail: `La subcategoría fue actualizada a "${formData.name}"`,
+      life: 3000
+    });
+    
+    // TODO: Cuando implementes el PUT:
     // const data = {
     //   category_id: this.dataToEdit?.id,
     //   category_name: formData.name,
@@ -294,6 +311,21 @@ export class DetalleSubcategoria implements OnInit {
    * Crea un nuevo producto en esta subcategoría
    */
   private crearProducto(formData: ProductFormData): void {
+    // Validar duplicados antes de llamar a la API
+    const nombreExistente = this.productos.find(
+      (prod) => prod.product_name.toLowerCase().trim() === formData.name.toLowerCase().trim()
+    );
+
+    if (nombreExistente) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Producto duplicado',
+        detail: `Ya existe un producto con el nombre "${formData.name}" en esta subcategoría`,
+        life: 4000
+      });
+      return;
+    }
+
     const data = {
       product_name: formData.name,
       product_price: formData.price,
@@ -308,11 +340,36 @@ export class DetalleSubcategoria implements OnInit {
     this.productService.createProduct(data).subscribe({
       next: (response) => {
         console.log('Producto creado exitosamente en subcategoría:', response);
+        
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Producto creado',
+          detail: `El producto "${formData.name}" fue creado exitosamente`,
+          life: 3000
+        });
+        
         // Recargar productos
         this.cargarProductos(this.subcategoriaId!);
       },
       error: (err) => {
         console.error('Error al crear producto:', err);
+        
+        let errorMsg = 'No se pudo crear el producto';
+        
+        if (err.status === 409) {
+          errorMsg = 'Ya existe un producto con ese nombre';
+        } else if (err.status === 400) {
+          errorMsg = 'Datos inválidos. Verifique la información';
+        } else if (err.status === 404) {
+          errorMsg = 'Servicio no disponible';
+        }
+        
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error al crear',
+          detail: errorMsg,
+          life: 4000
+        });
       }
     });
   }
@@ -322,6 +379,46 @@ export class DetalleSubcategoria implements OnInit {
    */
   private editarProducto(formData: ProductFormData): void {
     if (!this.currentEditingProductId) return;
+
+    // Buscar el producto original
+    const productoOriginal = this.productos.find(
+      (prod) => prod.product_id === this.currentEditingProductId
+    );
+
+    if (!productoOriginal) return;
+
+    // Detectar si hubo cambios
+    const sinCambios =
+      productoOriginal.product_name === formData.name &&
+      parseFloat(productoOriginal.product_price) === formData.price &&
+      parseFloat(productoOriginal.product_stock) === formData.stock &&
+      productoOriginal.product_needpreparation === (formData.needsPreparation ? '1' : '0') &&
+      productoOriginal.product_urlimage === (formData.imageUrl || '');
+
+    if (sinCambios) {
+      // No mostrar toast, cerrar modal silenciosamente
+      this.productModalVisible = false;
+      return;
+    }
+
+    // Validar duplicado de nombre (solo si cambió el nombre)
+    if (productoOriginal.product_name !== formData.name) {
+      const nombreDuplicado = this.productos.find(
+        (prod) =>
+          prod.product_id !== this.currentEditingProductId &&
+          prod.product_name.toLowerCase().trim() === formData.name.toLowerCase().trim()
+      );
+
+      if (nombreDuplicado) {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Producto duplicado',
+          detail: `Ya existe un producto con el nombre "${formData.name}" en esta subcategoría`,
+          life: 4000
+        });
+        return;
+      }
+    }
 
     const data = {
       product_id: this.currentEditingProductId,
@@ -338,11 +435,36 @@ export class DetalleSubcategoria implements OnInit {
     this.productService.updateProduct(data).subscribe({
       next: (response) => {
         console.log('Producto actualizado exitosamente:', response);
+        
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Producto actualizado',
+          detail: `El producto "${formData.name}" fue actualizado exitosamente`,
+          life: 3000
+        });
+        
         // Recargar productos
         this.cargarProductos(this.subcategoriaId!);
       },
       error: (err) => {
         console.error('Error al actualizar producto:', err);
+        
+        let errorMsg = 'No se pudo actualizar el producto';
+        
+        if (err.status === 409) {
+          errorMsg = 'Ya existe un producto con ese nombre';
+        } else if (err.status === 400) {
+          errorMsg = 'Datos inválidos. Verifique la información';
+        } else if (err.status === 404) {
+          errorMsg = 'Producto no encontrado';
+        }
+        
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error al actualizar',
+          detail: errorMsg,
+          life: 4000
+        });
       }
     });
   }

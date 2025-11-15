@@ -5,6 +5,7 @@ import { ProductFormData, ProductInitialData } from '../../../../../shared/produ
 import { CategoryFormData } from '../../../../../shared/category-modal/category-modal';
 import { CategoryService } from '../../../../../core/services/category.service';
 import { ProductService } from '../../../../../core/services/product.service';
+import { MessageService } from 'primeng/api';
 
 interface Subcategoria {
   category_id: string;
@@ -47,7 +48,8 @@ export class DetalleCategoria implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private categoryService: CategoryService,
-    private productService: ProductService
+    private productService: ProductService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
@@ -303,6 +305,21 @@ export class DetalleCategoria implements OnInit {
    * Crea una nueva subcategoría
    */
   private crearSubcategoria(formData: CategoryFormData): void {
+    // Validar duplicados antes de llamar a la API
+    const nombreExistente = this.subcategorias.find(
+      (sub) => sub.category_name.toLowerCase().trim() === formData.name.toLowerCase().trim()
+    );
+
+    if (nombreExistente) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Subcategoría duplicada',
+        detail: `Ya existe una subcategoría con el nombre "${formData.name}"`,
+        life: 4000
+      });
+      return;
+    }
+
     const data = {
       category_name: formData.name,
       category_categoryid: this.categoriaId, // ID de la categoría padre
@@ -313,11 +330,36 @@ export class DetalleCategoria implements OnInit {
     this.categoryService.createCategory(data).subscribe({
       next: (response) => {
         console.log('Subcategoría creada exitosamente:', response);
+        
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Subcategoría creada',
+          detail: `La subcategoría "${formData.name}" fue creada exitosamente`,
+          life: 3000
+        });
+        
         // Recargar subcategorías
         this.cargarSubcategorias(this.categoriaId!);
       },
       error: (err) => {
         console.error('Error al crear subcategoría:', err);
+        
+        let errorMsg = 'No se pudo crear la subcategoría';
+        
+        if (err.status === 409) {
+          errorMsg = 'Ya existe una subcategoría con ese nombre';
+        } else if (err.status === 400) {
+          errorMsg = 'Datos inválidos. Verifique la información';
+        } else if (err.status === 404) {
+          errorMsg = 'Servicio no disponible';
+        }
+        
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error al crear',
+          detail: errorMsg,
+          life: 4000
+        });
       }
     });
   }
@@ -387,6 +429,21 @@ export class DetalleCategoria implements OnInit {
    * Crea un nuevo producto general
    */
   private crearProducto(formData: ProductFormData): void {
+    // Validar duplicados antes de llamar a la API
+    const nombreExistente = this.productosGenerales.find(
+      (prod) => prod.product_name.toLowerCase().trim() === formData.name.toLowerCase().trim()
+    );
+
+    if (nombreExistente) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Producto duplicado',
+        detail: `Ya existe un producto con el nombre "${formData.name}"`,
+        life: 4000
+      });
+      return;
+    }
+
     const data = {
       product_name: formData.name,
       product_price: formData.price,
@@ -401,11 +458,36 @@ export class DetalleCategoria implements OnInit {
     this.productService.createProduct(data).subscribe({
       next: (response) => {
         console.log('Producto creado exitosamente:', response);
+        
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Producto creado',
+          detail: `El producto "${formData.name}" fue creado exitosamente`,
+          life: 3000
+        });
+        
         // Recargar productos
         this.cargarProductosGenerales(this.categoriaId!);
       },
       error: (err) => {
         console.error('Error al crear producto:', err);
+        
+        let errorMsg = 'No se pudo crear el producto';
+        
+        if (err.status === 409) {
+          errorMsg = 'Ya existe un producto con ese nombre';
+        } else if (err.status === 400) {
+          errorMsg = 'Datos inválidos. Verifique la información';
+        } else if (err.status === 404) {
+          errorMsg = 'Servicio no disponible';
+        }
+        
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error al crear',
+          detail: errorMsg,
+          life: 4000
+        });
       }
     });
   }
@@ -415,6 +497,46 @@ export class DetalleCategoria implements OnInit {
    */
   private editarProducto(formData: ProductFormData): void {
     if (!this.currentEditingProductId) return;
+
+    // Buscar el producto original
+    const productoOriginal = this.productosGenerales.find(
+      (prod) => prod.product_id === this.currentEditingProductId
+    );
+
+    if (!productoOriginal) return;
+
+    // Detectar si hubo cambios
+    const sinCambios =
+      productoOriginal.product_name === formData.name &&
+      parseFloat(productoOriginal.product_price) === formData.price &&
+      parseFloat(productoOriginal.product_stock) === formData.stock &&
+      productoOriginal.product_needpreparation === (formData.needsPreparation ? '1' : '0') &&
+      productoOriginal.product_urlimage === (formData.imageUrl || '');
+
+    if (sinCambios) {
+      // No mostrar toast, cerrar modal silenciosamente
+      this.productModalVisible = false;
+      return;
+    }
+
+    // Validar duplicado de nombre (solo si cambió el nombre)
+    if (productoOriginal.product_name !== formData.name) {
+      const nombreDuplicado = this.productosGenerales.find(
+        (prod) =>
+          prod.product_id !== this.currentEditingProductId &&
+          prod.product_name.toLowerCase().trim() === formData.name.toLowerCase().trim()
+      );
+
+      if (nombreDuplicado) {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Producto duplicado',
+          detail: `Ya existe un producto con el nombre "${formData.name}"`,
+          life: 4000
+        });
+        return;
+      }
+    }
 
     const data = {
       product_id: this.currentEditingProductId,
@@ -431,11 +553,36 @@ export class DetalleCategoria implements OnInit {
     this.productService.updateProduct(data).subscribe({
       next: (response) => {
         console.log('Producto actualizado exitosamente:', response);
+        
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Producto actualizado',
+          detail: `El producto "${formData.name}" fue actualizado exitosamente`,
+          life: 3000
+        });
+        
         // Recargar productos
         this.cargarProductosGenerales(this.categoriaId!);
       },
       error: (err) => {
         console.error('Error al actualizar producto:', err);
+        
+        let errorMsg = 'No se pudo actualizar el producto';
+        
+        if (err.status === 409) {
+          errorMsg = 'Ya existe un producto con ese nombre';
+        } else if (err.status === 400) {
+          errorMsg = 'Datos inválidos. Verifique la información';
+        } else if (err.status === 404) {
+          errorMsg = 'Producto no encontrado';
+        }
+        
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error al actualizar',
+          detail: errorMsg,
+          life: 4000
+        });
       }
     });
   }

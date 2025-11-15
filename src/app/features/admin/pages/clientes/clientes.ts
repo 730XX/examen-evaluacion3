@@ -48,9 +48,6 @@ export class Clientes implements OnInit {
   
   private cargarClientes(): void {
     this.loadingClientes = true;    
-    // Llamar al servicio con los parámetros por defecto
-    // page: '-1' = todos, perPage: '-1' = todos, customer_name: '-1' = todos
-    // customer_typedocument: '-1' = todos, customer_state: '1' = solo activos
     this.customersService.getCustomers('-1', '-1', '-1', '-1', '-1').subscribe({
       next: (response) => {
         console.log('Respuesta de getCustomers:', response);

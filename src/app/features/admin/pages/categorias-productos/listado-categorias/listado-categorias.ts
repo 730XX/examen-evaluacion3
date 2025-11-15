@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CategoryFormData } from '../../../../../shared/category-modal/category-modal';
 import { CategoryService } from '../../../../../core/services/category.service';
+import { MessageService } from 'primeng/api';
 
 interface CategoriaPrincipal {
   category_id: string;
@@ -33,7 +34,10 @@ export class ListadoCategorias implements OnInit {
   public dataToEdit: { name: string, imageUrl: string } | null = null;
 
 
-  constructor(private categoryService: CategoryService) { }
+  constructor(
+    private categoryService: CategoryService,
+    private messageService: MessageService
+  ) { }
 
   ngOnInit(): void {
     this.cargarCategoriasPrincipales();
@@ -112,6 +116,21 @@ export class ListadoCategorias implements OnInit {
    * Crea una nueva categoría principal
    */
   private crearCategoria(formData: CategoryFormData): void {
+    // Validar duplicados antes de llamar a la API
+    const nombreExistente = this.categoriasPrincipales.find(
+      (cat) => cat.category_name.toLowerCase().trim() === formData.name.toLowerCase().trim()
+    );
+
+    if (nombreExistente) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Categoría duplicada',
+        detail: `Ya existe una categoría con el nombre "${formData.name}"`,
+        life: 4000
+      });
+      return; // No hace la petición a la API
+    }
+
     // Si hay un archivo de imagen, necesitamos usar FormData
     // Si no, podemos enviar JSON simple
     
@@ -135,11 +154,38 @@ export class ListadoCategorias implements OnInit {
       this.categoryService.createCategory(data).subscribe({
         next: (response) => {
           console.log('Categoría creada exitosamente:', response);
+          
+          // Toast de éxito
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Categoría creada',
+            detail: `La categoría "${formData.name}" fue creada exitosamente`,
+            life: 3000
+          });
+          
           // Recargar la lista
           this.cargarCategoriasPrincipales();
         },
         error: (err) => {
           console.error('Error al crear categoría:', err);
+          
+          // Toast de error con mensaje contextual
+          let errorMsg = 'No se pudo crear la categoría';
+          
+          if (err.status === 409) {
+            errorMsg = 'Ya existe una categoría con ese nombre';
+          } else if (err.status === 400) {
+            errorMsg = 'Datos inválidos. Verifique la información';
+          } else if (err.status === 404) {
+            errorMsg = 'Servicio no disponible';
+          }
+          
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error al crear',
+            detail: errorMsg,
+            life: 4000
+          });
         }
       });
     }
