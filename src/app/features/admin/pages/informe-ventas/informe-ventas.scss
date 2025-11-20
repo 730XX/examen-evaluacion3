@@ -1,0 +1,31 @@
+::ng-deep {
+  .custom-dialog {
+    .p-dialog-header {
+      background-color: #1f242f;
+      border-bottom: 1px solid #374151;
+      color: white;
+      padding: 1rem 1.5rem;
+    }
+
+    .p-dialog-content {
+      background-color: #111317;
+      color: white;
+      padding: 1.5rem;
+    }
+
+    .p-dialog-footer {
+      background-color: #1f242f;
+      border-top: 1px solid #374151;
+      padding: 1rem 1.5rem;
+    }
+
+    .p-dialog-header-close {
+      color: #9ca3af;
+      
+      &:hover {
+        color: white;
+        background-color: rgba(60, 130, 245, 0.1);
+      }
+    }
+  }
+}

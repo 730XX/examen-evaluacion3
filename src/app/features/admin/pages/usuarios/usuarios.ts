@@ -184,7 +184,6 @@ export class Usuarios implements OnInit {
     const usuarioActual = this.usuarios.find(u => u.user_id === this.currentEditingUserId);
     if (!usuarioActual) return;
 
-    // Validar si hay cambios
     const sinCambios = 
       usuarioActual.user_name === formData.name &&
       usuarioActual.user_email === formData.email &&
@@ -196,7 +195,6 @@ export class Usuarios implements OnInit {
       return;
     }
 
-    // Validar email duplicado (excluyendo el actual)
     const emailDuplicado = this.usuarios.some(
       (u: User) => u.user_id !== this.currentEditingUserId &&
                    u.user_email.toLowerCase().trim() === formData.email.toLowerCase().trim()

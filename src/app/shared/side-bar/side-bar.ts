@@ -29,7 +29,7 @@ export class SideBar {
     },
     {
       title: 'Informe de ventas',
-      href: '/admin/pedidos',
+      href: '/admin/informe-ventas',
       icon: 'receipt_long',
     },
   ];

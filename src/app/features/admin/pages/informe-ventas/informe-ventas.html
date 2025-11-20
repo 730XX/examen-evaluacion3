@@ -1,0 +1,179 @@
+<div class="w-full h-full flex flex-col bg-[#111317] text-white">
+  
+  <!-- HEADER -->
+  <div class="flex items-center p-4 border-b border-gray-700 flex-none">
+    <span class="text-2xl font-bold font-montserrat">Informe de Ventas</span>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="flex items-center justify-between gap-4 p-4 border-b border-gray-700 flex-none">
+    <!-- Buscador -->
+    <input 
+      type="text"
+      placeholder="Buscar por cliente o mesero..."
+      class="w-full md:w-1/3 px-4 py-2 bg-[#1f242f] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#3c82f5] transition-colors"
+    >
+
+    <!-- Botón refrescar -->
+    <button 
+      
+      class="flex-none px-4 py-2 bg-[#3c82f5] text-white text-sm font-medium rounded-lg hover:bg-[#5a9aff] transition-colors flex items-center gap-2"
+    >
+      <i class="pi pi-refresh"></i>
+      Actualizar
+    </button>
+  </div>
+
+  <!-- CONTENIDO -->
+  <div class="flex-1 p-4 overflow-y-auto">
+    
+    <!-- Indicador de carga -->
+    <div *ngIf="loadingVentas" class="text-gray-400 text-sm animate-pulse mb-4">
+      Cargando ventas...
+    </div>
+
+    <!-- Mensaje si no hay ventas -->
+    <div *ngIf="!loadingVentas && ventas.length === 0" class="text-gray-500 text-sm mb-4">
+      No hay ventas registradas.
+    </div>
+
+    <!-- Tabla de ventas -->
+    <div *ngIf="!loadingVentas && ventas.length > 0" class="bg-[#1f242f] rounded-lg border border-gray-700 overflow-hidden">
+      <table class="w-full">
+        <thead class="bg-[#111317] border-b border-gray-700">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">ID Venta</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Fecha</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Mesero</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Cliente</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Monto</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-700">
+          <tr *ngFor="let venta of ventas" class="hover:bg-[#2a2f3a] transition-colors">
+            <td class="px-4 py-3 text-sm text-white">#{{ venta.sale_id }}</td>
+            <td class="px-4 py-3 text-sm text-gray-300">{{ formatearFecha(venta.sale_datecreation) }}</td>
+            <td class="px-4 py-3 text-sm text-gray-300">{{ venta.mesero?.user_name || 'Sin asignar' }}</td>
+            <td class="px-4 py-3 text-sm text-gray-300">{{ venta.customer_name || 'Sin nombre' }}</td>
+            <td class="px-4 py-3 text-sm text-white font-semibold">{{ formatearMonto(venta.sale_total) }}</td>
+
+            <td class="px-4 py-3 text-sm">
+              <button
+                (click)="verDetalle(venta)"
+                class="text-[#3c82f5] hover:text-[#5a9aff] transition-colors"
+                title="Ver detalle"
+              >
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE DETALLE -->
+<p-dialog 
+  [(visible)]="modalDetalleVisible"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '700px', maxWidth: '90vw' }"
+  styleClass="custom-dialog"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-2">
+      <i class="pi pi-file-check text-[#3c82f5]"></i>
+      <span class="text-xl font-bold">Detalle de Venta #{{ ventaSeleccionada?.sale_id }}</span>
+    </div>
+  </ng-template>
+
+  <div *ngIf="ventaSeleccionada" class="space-y-4">
+    
+    <!-- Información general -->
+    <div class="grid grid-cols-2 gap-4 p-4 bg-[#1f242f] rounded-lg border border-gray-700">
+      <div>
+        <p class="text-xs text-gray-400 uppercase mb-1">Mesa</p>
+        <p class="text-white font-semibold">{{ ventaSeleccionada.mesa?.tablee_name || 'Sin mesa' }}</p>
+      </div>
+      <div>
+        <p class="text-xs text-gray-400 uppercase mb-1">Fecha</p>
+        <p class="text-white font-semibold">{{ formatearFecha(ventaSeleccionada.sale_datecreation) }}</p>
+      </div>
+      <div>
+        <p class="text-xs text-gray-400 uppercase mb-1">Cliente</p>
+        <p class="text-white font-semibold">{{ ventaSeleccionada.customer_name || 'Sin nombre' }}</p>
+      </div>
+      <div>
+        <p class="text-xs text-gray-400 uppercase mb-1">Mesero</p>
+        <p class="text-white font-semibold">{{ ventaSeleccionada.mesero?.user_name || 'Sin asignar' }}</p>
+      </div>
+    </div>
+
+    <!-- Productos -->
+    <div class="space-y-2">
+      <h3 class="text-sm font-bold text-gray-300 uppercase">Productos</h3>
+      <div class="bg-[#1f242f] rounded-lg border border-gray-700 overflow-hidden">
+        <table class="w-full">
+          <thead class="bg-[#111317] border-b border-gray-700">
+            <tr>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-400">Cant.</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-400">Producto</th>
+              <th class="px-4 py-2 text-right text-xs font-semibold text-gray-400">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-700">
+            <tr *ngFor="let item of ventaSeleccionada.detalle">
+              <td class="px-4 py-2 text-sm text-white">{{ formatearCantidad(item.saledetail_quantity) }}</td>
+              <td class="px-4 py-2 text-sm text-gray-300">{{ item.product_name || 'Producto sin nombre' }}</td>
+              <td class="px-4 py-2 text-sm text-white text-right font-semibold">{{ formatearMonto(item.saledetail_amount) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Método de pago -->
+    <div class="space-y-2">
+      <h3 class="text-sm font-bold text-gray-300 uppercase">Método de Pago</h3>
+      <div class="bg-[#1f242f] rounded-lg border border-gray-700 p-3">
+        <div *ngFor="let pago of ventaSeleccionada.pagos" class="flex justify-between items-center">
+          <span class="text-gray-300">{{ getMetodoPago(pago.salepayment_method) }}</span>
+          <span class="text-white font-semibold">{{ formatearMonto(pago.salepayment_amount) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen de totales -->
+    <div class="bg-[#1f242f] rounded-lg border border-gray-700 p-4 space-y-2">
+      <div class="flex justify-between items-center">
+        <span class="text-red-400">Descuento</span>
+        <span class="text-red-500 ">- {{ formatearMonto(ventaSeleccionada.sale_discount) }}</span>
+      </div>
+      <div class="flex justify-between items-center pt-2 border-t border-gray-700">
+        <span class="text-gray-300 font-semibold">Total Venta</span>
+        <span class="text-white font-bold text-lg">{{ formatearMonto(ventaSeleccionada.sale_total) }}</span>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="text-gray-300 font-semibold">Total Pagado</span>
+        <span class="text-[#3c82f5] font-bold text-2xl">{{ formatearMonto(getTotalPagado(ventaSeleccionada).toString()) }}</span>
+      </div>
+    </div>
+
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button
+      (click)="modalDetalleVisible = false"
+      class="px-6 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors"
+    >
+      Cerrar
+    </button>
+  </ng-template>
+</p-dialog>
+
+<p-toast position="top-right" />

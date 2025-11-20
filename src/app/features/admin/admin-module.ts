@@ -15,6 +15,7 @@ import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ButtonModule } from 'primeng/button';
 import { Usuarios } from './pages/usuarios/usuarios';
+import { InformeVentas } from './pages/informe-ventas/informe-ventas';
 
 
 
@@ -29,6 +30,7 @@ import { Usuarios } from './pages/usuarios/usuarios';
     DetalleCategoria,
     DetalleSubcategoria,
     Usuarios,
+    InformeVentas,
   ],
   imports: [
     CommonModule,

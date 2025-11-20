@@ -8,17 +8,17 @@ import { ListadoCategorias } from './pages/categorias-productos/listado-categori
 import { DetalleCategoria } from './pages/categorias-productos/detalle-categoria/detalle-categoria';
 import { DetalleSubcategoria } from './pages/categorias-productos/detalle-subcategoria/detalle-subcategoria';
 import { Usuarios } from './pages/usuarios/usuarios';
+import { InformeVentas } from './pages/informe-ventas/informe-ventas';
 
 const routes: Routes = [
-  // --- RUTAS ANIDADAS ---
   // Todas las rutas aquí están bajo el prefijo 'admin/'
   {
-    path: '', // El path vacío ('admin/')
-    component: Admin, // Carga el LAYOUT (con el sidebar)
+    path: '',
+    component: Admin,
     children: [
-      // --- Estas rutas se cargarán DENTRO del <router-outlet> del AdminComponent ---
+      // <router-outlet>
       {
-        path: 'salonesymesas', // -> admin/salonesymesas
+        path: 'salonesymesas',
         component: SalonesMesas
       },
       
@@ -60,6 +60,11 @@ const routes: Routes = [
       {
         path: 'usuarios', // -> admin/usuarios
         component: Usuarios
+      },
+
+      {
+        path : 'informe-ventas', // -> admin/informe-ventas
+        component: InformeVentas
       }
     ]
   }
