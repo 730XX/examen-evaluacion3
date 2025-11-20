@@ -75,29 +75,54 @@
           <table class="w-full">
             <thead class="bg-[#151a23]">
               <tr>
-                <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider">Mesa</th>
-                <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider">Estado</th>
-                <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider">Mozo</th>
+                <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider">Nombre de Mesa</th>
                 <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider">Acciones</th>
               </tr>
             </thead>
 
             <tbody class="divide-y divide-gray-700">
               <tr *ngFor="let mesa of mesas"
-                  (click)="seleccionarMesa(mesa)"
-                  class="hover:bg-[#252b38] transition-colors cursor-pointer"
-                  [ngClass]="mesaSeleccionada?.tablee_id === mesa.tablee_id ? 'bg-[#2a3f5f]' : ''">
+                  class="hover:bg-[#252b38] transition-colors"
+                  [ngClass]="mesaEnEdicion?.tablee_id === mesa.tablee_id ? 'bg-[#2a3f5f]' : ''">
 
-                <td class="px-6 py-4 text-sm font-medium text-white">{{ mesa.tablee_name}}</td>
-                <!-- <td class="px-6 py-4 text-sm text-gray-300">{{ mesa.tablee_state | tableState }}</td> -->
-                <td class="px-6 py-4 text-sm text-gray-300">{{ mesa.tablee_mozo || 'Sin asignar' }}</td>
+                <!-- Modo Vista -->
+                <td class="px-6 py-4 text-sm font-medium text-white" *ngIf="mesaEnEdicion?.tablee_id !== mesa.tablee_id">
+                  {{ mesa.tablee_name }}
+                </td>
 
+                <!-- Modo Edición -->
+                <td class="px-6 py-4 text-sm font-medium" *ngIf="mesaEnEdicion?.tablee_id === mesa.tablee_id">
+                  <input 
+                    type="text"
+                    [(ngModel)]="nombreMesaEditando"
+                    placeholder="Nombre de mesa"
+                    class="w-full bg-[#111317] border border-[#3c82f5] rounded-lg text-white px-3 py-2 focus:outline-none focus:border-[#5a9aff] transition-colors"
+                  />
+                </td>
+
+                <!-- Acciones -->
                 <td class="px-6 py-4 text-sm text-gray-300">
-                  <button class="text-[#3c82f5] hover:text-[#5a9aff] mr-3 transition-colors"
-                          (click)="$event.stopPropagation(); verMesa(mesa)">
-                    Ver detalles
+                  <!-- Botón Editar (modo vista) -->
+                  <button 
+                    *ngIf="mesaEnEdicion?.tablee_id !== mesa.tablee_id"
+                    (click)="iniciarEdicionMesa(mesa)"
+                    class="text-[#3c82f5] hover:text-[#5a9aff] transition-colors font-medium">
+                    Editar
                   </button>
-                  <!-- (Aquí podrías añadir un botón para editar mesa) -->
+
+                  <!-- Botones Aceptar/Cancelar (modo edición) -->
+                  <div *ngIf="mesaEnEdicion?.tablee_id === mesa.tablee_id" class="flex gap-2">
+                    <button 
+                      (click)="guardarEdicionMesa(mesa)"
+                      class="text-green-500 hover:text-green-400 transition-colors font-medium">
+                      ✓ Aceptar
+                    </button>
+                    <button 
+                      (click)="cancelarEdicionMesa()"
+                      class="text-red-500 hover:text-red-400 transition-colors font-medium">
+                      ✗ Cancelar
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>

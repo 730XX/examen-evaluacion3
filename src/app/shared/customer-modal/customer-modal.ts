@@ -41,11 +41,10 @@ export class CustomerModal implements OnChanges {
 
   public customerForm: FormGroup;
   public headerTitle: string = 'Crear Cliente';
-  public documentTypes: any[] = [
+  public typeDocumentOptions: any[] = [
     { label: 'DNI', value: '1' },
-    { label: 'RUC', value: '2' },
-    { label: 'Carnet de Extranjería', value: '3' },
-    { label: 'Otro', value: '4' }
+    { label: 'Carnet de Extranjería', value: '2' },
+    { label: 'Pasaporte', value: '3' }
   ];
 
   constructor(private fb: FormBuilder) {

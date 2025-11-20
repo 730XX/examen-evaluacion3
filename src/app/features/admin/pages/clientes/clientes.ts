@@ -25,12 +25,14 @@ interface Customer {
 })
 export class Clientes implements OnInit {
   public clientes: Customer[] = [];
+  public clientesFiltrados: Customer[] = [];
   public loadingClientes: boolean = false;
 
   public modalVisible: boolean = false;
   public modalMode: 'create' | 'edit' = 'create';
   public dataToEdit: any | null = null;
   private currentEditingCustomerId: string | null = null;
+  public showInactive: boolean = false;
 
   constructor(
     private customersService: CustomersService,
@@ -41,23 +43,43 @@ export class Clientes implements OnInit {
     this.cargarClientes();
   }
 
-  
-  private cargarClientes(): void {
+   private cargarClientes(): void {
     this.loadingClientes = true;    
+
+    // Siempre cargamos todos los clientes desde la API
     this.customersService.getCustomers('-1', '-1', '-1', '-1', '-1').subscribe({
       next: (response) => {
         if (response && response.data) {
-          this.clientes = response.data;
+            // Guardamos todos los clientes
+            this.clientes = response.data;
+            // Aplicamos el filtro según showInactive
+            this.aplicarFiltro();
         } else {
           this.clientes = [];
+          this.clientesFiltrados = [];
         }
         this.loadingClientes = false;
       },
       error: (err) => {
         this.loadingClientes = false;
         this.clientes = [];
+        this.clientesFiltrados = [];
       }
     });
+  }
+
+  private aplicarFiltro(): void {
+    if (this.showInactive) {
+      // Mostrar todos los clientes
+      this.clientesFiltrados = this.clientes;
+    } else {
+      // Mostrar solo activos (estado = '1')
+      this.clientesFiltrados = this.clientes.filter((cliente: Customer) => cliente.customer_state === '1');
+    }
+  }
+
+  public toggleShowInactive(): void {
+    this.cargarClientes();
   }
 
   public getDocumentType(type: string): string {
@@ -65,9 +87,9 @@ export class Clientes implements OnInit {
       case '1':
         return 'DNI';
       case '2':
-        return 'RUC';
-      case '3':
         return 'C.E.';
+      case '3':
+        return 'Pasaporte';
       default:
         return 'Otro';
     }

@@ -6,7 +6,16 @@ import { CategoryFormData } from '../../../../../shared/category-modal/category-
 import { CategoryService } from '../../../../../core/services/category.service';
 import { ProductService } from '../../../../../core/services/product.service';
 import { MessageService } from 'primeng/api';
+import { CategoriasProductos } from '../categorias-productos';
 
+interface CategoriaPrincipal {
+  category_id: string;
+  category_name: string;
+  category_categoryid: string;
+  category_urlimage: string;
+  category_state: string;
+  cantidad_productos: string;
+}
 interface Subcategoria {
   category_id: string;
   category_name: string;
@@ -43,6 +52,7 @@ export class DetalleCategoria implements OnInit {
 
   // Arrays para almacenar los datos de la API
   public subcategorias: Subcategoria[] = [];
+  public categorias: CategoriaPrincipal[] = [];
   public productosGenerales: ProductoGeneral[] = [];
 
   constructor(
@@ -226,21 +236,87 @@ export class DetalleCategoria implements OnInit {
    * Edita una subcategoría existente
    */
   private editarSubcategoria(formData: CategoryFormData): void {
-    // TODO: Implementar actualización
-    console.log('--- EDITANDO SUBCATEGORÍA ---');
-    console.log('ID a editar:', this.dataToEdit?.id);
-    console.log('Nuevos Datos:', formData);
+    const subcategoriaId = this.dataToEdit?.id;
+    if (!subcategoriaId) return;
+
+    const data = {
+      category_id: subcategoriaId,
+      category_name: formData.name,
+      category_categoryid: this.categoriaId, // ID de la categoría padre
+      category_urlimage: formData.imageUrl || '',
+      category_state: '1'
+    };
+
+    this.categoryService.updateCategory(data).subscribe({
+      next: (response) => {
+        this.messageService.add({
+          severity: 'success',
+          summary: '¡Éxito!',
+          detail: 'Subcategoría actualizada correctamente',
+          life: 3000
+        });
+        this.cargarSubcategorias(this.categoriaId!);
+        this.modalVisible = false;
+      },
+      error: (err) => {
+        let errorMsg = 'Error al actualizar la subcategoría. Intenta nuevamente.';
+        if (err.status === 409) {
+          errorMsg = 'Ya existe una subcategoría con ese nombre';
+        } else if (err.status === 400) {
+          errorMsg = 'Datos inválidos. Verifica la información';
+        }
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: errorMsg,
+          life: 4000
+        });
+      }
+    });
   }
 
   /**
    * Edita la categoría principal
    */
   private editarCategoriaPrincipal(formData: CategoryFormData): void {
-    // TODO: Implementar actualización
-    console.log('--- EDITANDO CATEGORÍA PRINCIPAL ---');
-    console.log('ID a editar:', this.dataToEdit?.id);
-    console.log('Nuevos Datos:', formData);
-    this.categoriaNombre = formData.name;
+    const categoriaId = this.categoriaId;
+    if (!categoriaId) return;
+
+    const data = {
+      category_id: categoriaId,
+      category_name: formData.name,
+      category_urlimage: formData.imageUrl || '',
+      category_state: '1'
+    };
+
+    this.categoryService.updateCategory(data).subscribe({
+      next: (response) => {
+        this.messageService.add({
+          severity: 'success',
+          summary: '¡Éxito!',
+          detail: 'Categoría actualizada correctamente',
+          life: 3000
+        });
+        // Actualizar el nombre en memoria
+        this.categoriaNombre = formData.name;
+        this.categoriaImageUrl = formData.imageUrl || '';
+        this.modalVisible = false;
+      },
+      error: (err) => {
+        let errorMsg = 'Error al actualizar la categoría. Intenta nuevamente.';
+        if (err.status === 409) {
+          errorMsg = 'Ya existe una categoría con ese nombre';
+        } else if (err.status === 400) {
+          errorMsg = 'Datos inválidos. Verifica la información';
+        }
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: errorMsg,
+          life: 4000
+        });
+      }
+    });
   }
 
   // --- Métodos que controlan el Modal de PRODUCTOS ---
@@ -356,7 +432,7 @@ export class DetalleCategoria implements OnInit {
   private editarProducto(formData: ProductFormData): void {
     if (!this.currentEditingProductId) return;
 
-    // Buscar el producto original
+    // Buscar el producto original    
     const productoOriginal = this.productosGenerales.find(
       (prod) => prod.product_id === this.currentEditingProductId
     );
@@ -364,7 +440,7 @@ export class DetalleCategoria implements OnInit {
     if (!productoOriginal) return;
 
     // Detectar si hubo cambios
-    const sinCambios =
+    const sinCambios =  
       productoOriginal.product_name === formData.name &&
       parseFloat(productoOriginal.product_price) === formData.price &&
       parseFloat(productoOriginal.product_stock) === formData.stock &&
@@ -374,18 +450,18 @@ export class DetalleCategoria implements OnInit {
     if (sinCambios) {
       // No mostrar toast, cerrar modal silenciosamente
       this.productModalVisible = false;
-      return;
+      return; 
     }
 
     // Validar duplicado de nombre (solo si cambió el nombre)
     if (productoOriginal.product_name !== formData.name) {
-      const nombreDuplicado = this.productosGenerales.find(
+      const nombreDuplicado = this.productosGenerales.find( 
         (prod) =>
           prod.product_id !== this.currentEditingProductId &&
           prod.product_name.toLowerCase().trim() === formData.name.toLowerCase().trim()
       );
 
-      if (nombreDuplicado) {
+      if (nombreDuplicado) {  
         this.messageService.add({
           severity: 'warn',
           summary: 'Producto duplicado',
@@ -396,7 +472,7 @@ export class DetalleCategoria implements OnInit {
       }
     }
 
-    const data = {
+    const data = {  
       product_id: this.currentEditingProductId,
       product_name: formData.name,
       product_price: formData.price,
@@ -409,7 +485,7 @@ export class DetalleCategoria implements OnInit {
     };
 
     this.productService.updateProduct(data).subscribe({
-      next: (response) => {
+      next: (response) => { 
         console.log('Producto actualizado exitosamente:', response);
         
         this.messageService.add({

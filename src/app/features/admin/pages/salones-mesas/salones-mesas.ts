@@ -25,6 +25,10 @@ export class SalonesMesas implements OnInit {
   modalMode: 'create' | 'edit' = 'create';
   dataToEdit: LoungeInitialData | null = null;
   private currentEditingLoungeId: number | null = null;
+  
+  // Estado de edición de mesas
+  mesaEnEdicion: TableModel | null = null;
+  nombreMesaEditando: string = '';
 
   constructor(
     private loungeService: LoungeService,
@@ -83,7 +87,73 @@ export class SalonesMesas implements OnInit {
     this.mesaSeleccionada = mesa;
   }
 
-  verMesa(mesa: TableModel): void {
+  public iniciarEdicionMesa(mesa: TableModel): void {
+    this.mesaEnEdicion = mesa;
+    this.nombreMesaEditando = mesa.tablee_name || '';
+  }
+
+  public cancelarEdicionMesa(): void {
+    this.mesaEnEdicion = null;
+    this.nombreMesaEditando = '';
+  }
+
+  public guardarEdicionMesa(mesa: TableModel): void {
+    if (!this.nombreMesaEditando || !this.nombreMesaEditando.trim()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertencia',
+        detail: 'El nombre de la mesa no puede estar vacío',
+        life: 3000
+      });
+      return;
+    }
+
+    if (this.nombreMesaEditando.trim() === mesa.tablee_name) {
+      this.mesaEnEdicion = null;
+      return;
+    }
+
+    const mesaActualizada = {
+      ...mesa,
+      tablee_name: this.nombreMesaEditando.trim()
+    };
+
+    this.tableService.updateTable(mesaActualizada).subscribe({
+      next: (response) => {
+        if (response.tipo === '1' || response.tipo === 'SUCCESS') {
+          this.messageService.add({
+            severity: 'success',
+            summary: '¡Éxito!',
+            detail: 'Nombre de mesa actualizado correctamente',
+            life: 3000
+          });
+          mesa.tablee_name = this.nombreMesaEditando.trim();
+          this.mesaEnEdicion = null;
+          this.nombreMesaEditando = '';
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: response.mensajes?.[0] || 'Error al actualizar mesa',
+            life: 4000
+          });
+        }
+      },
+      error: (err) => {
+        let errorMsg = 'Error al actualizar la mesa. Intenta nuevamente.';
+        if (err.status === 400) {
+          errorMsg = 'Datos inválidos. Verifica el nombre.';
+        } else if (err.status === 404) {
+          errorMsg = 'Mesa no encontrada.';
+        }
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: errorMsg,
+          life: 4000
+        });
+      }
+    });
   }
 
   public showCreateLoungeDialog(): void {
@@ -120,7 +190,7 @@ export class SalonesMesas implements OnInit {
     const storeId = parseInt(localStorage.getItem('store_id') || '1', 10);
 
     const nombreDuplicado = this.salones.some(
-      s => s.lounge_name.toLowerCase().trim() === formData.name.toLowerCase().trim()
+      s => s.lounge_name && s.lounge_name.toLowerCase().trim() === formData.name.toLowerCase().trim()
     );
 
     if (nombreDuplicado) {
@@ -202,7 +272,7 @@ export class SalonesMesas implements OnInit {
 
     const nombreDuplicado = this.salones.some(
       s => s.lounge_id !== this.currentEditingLoungeId &&
-           s.lounge_name.toLowerCase().trim() === formData.name.toLowerCase().trim()
+           s.lounge_name && s.lounge_name.toLowerCase().trim() === formData.name.toLowerCase().trim()
     );
 
     if (nombreDuplicado) {

@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AdminRoutingModule } from './admin-routing-module';
 import { Admin } from './admin';
 import { SalonesMesas } from './pages/salones-mesas/salones-mesas';
@@ -29,6 +30,7 @@ import { ButtonModule } from 'primeng/button';
   ],
   imports: [
     CommonModule,
+    FormsModule,
     AdminRoutingModule,
     SharedModule,
     ButtonModule,
