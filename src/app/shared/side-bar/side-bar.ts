@@ -22,6 +22,15 @@ export class SideBar {
       title: 'Clientes',
       href: '/admin/clientes',
       icon: 'group',
+    },{
+      title: 'Usuarios',
+      href: '/admin/usuarios',
+      icon: 'person',
+    },
+    {
+      title: 'Informe de ventas',
+      href: '/admin/pedidos',
+      icon: 'receipt_long',
     },
   ];
 }

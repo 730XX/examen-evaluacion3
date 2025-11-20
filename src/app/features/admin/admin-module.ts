@@ -14,6 +14,7 @@ import { Dialog } from 'primeng/dialog';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ButtonModule } from 'primeng/button';
+import { Usuarios } from './pages/usuarios/usuarios';
 
 
 
@@ -27,6 +28,7 @@ import { ButtonModule } from 'primeng/button';
     ListadoCategorias,
     DetalleCategoria,
     DetalleSubcategoria,
+    Usuarios,
   ],
   imports: [
     CommonModule,

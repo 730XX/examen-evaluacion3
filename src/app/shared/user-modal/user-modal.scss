@@ -1,0 +1,37 @@
+:host ::ng-deep {
+  .p-dialog-content {
+    padding: 1.5rem;
+  }
+
+  .p-select {
+    width: 100%;
+  }
+
+  .p-select-label {
+    color: white;
+  }
+
+  .p-select-trigger {
+    background-color: #111317;
+    border-color: #374151;
+  }
+
+  .p-dropdown-panel {
+    background-color: #1f242f;
+    border-color: #374151;
+  }
+
+  .p-dropdown-items .p-dropdown-item {
+    color: white;
+    padding: 0.75rem;
+
+    &:hover {
+      background-color: #2a3f5f;
+    }
+  }
+
+  .p-dropdown-item.p-highlight {
+    background-color: #3c82f5;
+    color: white;
+  }
+}

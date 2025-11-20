@@ -7,6 +7,7 @@ import { Clientes } from './pages/clientes/clientes';
 import { ListadoCategorias } from './pages/categorias-productos/listado-categorias/listado-categorias';
 import { DetalleCategoria } from './pages/categorias-productos/detalle-categoria/detalle-categoria';
 import { DetalleSubcategoria } from './pages/categorias-productos/detalle-subcategoria/detalle-subcategoria';
+import { Usuarios } from './pages/usuarios/usuarios';
 
 const routes: Routes = [
   // --- RUTAS ANIDADAS ---
@@ -54,6 +55,11 @@ const routes: Routes = [
         path: '',
         redirectTo: 'salonesymesas', // Redirige 'admin/' a 'admin/salonesymesas'
         pathMatch: 'full'
+      },
+
+      {
+        path: 'usuarios', // -> admin/usuarios
+        component: Usuarios
       }
     ]
   }

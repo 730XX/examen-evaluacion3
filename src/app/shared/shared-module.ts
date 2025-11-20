@@ -14,6 +14,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProductModal } from './product-modal/product-modal';
 import { CustomerModal } from './customer-modal/customer-modal';
 import { LoungeModal } from './lounge-modal/lounge-modal';
+import { UserModal } from './user-modal/user-modal';
 
 
 
@@ -25,7 +26,8 @@ import { LoungeModal } from './lounge-modal/lounge-modal';
     CategoryModal,
     ProductModal,
     CustomerModal,
-    LoungeModal
+    LoungeModal,
+    UserModal
   ],
   imports: [
     CommonModule,
@@ -44,7 +46,8 @@ import { LoungeModal } from './lounge-modal/lounge-modal';
     CategoryModal,
     ProductModal,
     CustomerModal,
-    LoungeModal
+    LoungeModal,
+    UserModal
   ]
 })
 export class SharedModule { }
