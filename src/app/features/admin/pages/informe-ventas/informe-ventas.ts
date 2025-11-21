@@ -54,10 +54,10 @@ export class InformeVentas implements OnInit {
   }
 
   public verDetalle(venta: Sale): void {
-    console.log('Venta seleccionada:', venta);
-    console.log('Detalle de productos:', venta.detalle);
+    //console.log('Venta seleccionada:', venta);
+    //console.log('Detalle de productos:', venta.detalle);
     if (venta.detalle && venta.detalle.length > 0) {
-      console.log('Primer producto:', venta.detalle[0]);
+      //console.log('Primer producto:', venta.detalle[0]);
     }
     this.ventaSeleccionada = venta;
     this.modalDetalleVisible = true;
